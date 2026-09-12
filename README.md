@@ -1,57 +1,59 @@
-# 🎨 LINE Sticker Maker Pro (LINE 貼圖與表情貼一站式製作工具)
+# 🎨 LINE Sticker Maker Pro Max (LINE 貼圖與表情貼一站式製作工具)
 
 [![GitHub license](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 [![React](https://img.shields.io/badge/React-18-blue.svg)](https://react.dev/)
 [![TailwindCSS](https://img.shields.io/badge/TailwindCSS-3-38B2AC.svg)](https://tailwindcss.com/)
+[![Version](https://img.shields.io/badge/version-v2.2%20Pro%20Max-emerald.svg)](https://github.com/dinghnes/line-sticker-maker/releases)
 
-一款專為 **LINE 貼圖 (Stickers)** 與 **LINE 表情貼 (Emojis)** 打造的自動化生產工具。整合 **「AI 咒語產生器」** 與 **「4×3 網格自動精準切圖 ＋ 綠幕色鍵智能去背」**，讓您從 Midjourney / DALL-E 生成到打包上架 LINE 原創市集一氣呵成！
+專為 **LINE 貼圖 (Stickers)** 與 **LINE 表情貼 (Emojis)** 打造的全方位生產工具。整合 **「AI 咒語產生器」** 與 **「4×3 網格切圖 ＋ 外圍泛洪防穿孔智能去背 ＋ LINE 官方審核素材一鍵打包」**，從 Midjourney / DALL-E 生成到直接上架 LINE 原創市集一氣呵成！
 
-🌐 **線上即開即用（無需安裝）**：[開啟網頁版](https://dinghnes.github.io/line-sticker-maker/)
-
----
-
-## ✨ 核心特色
-
-### 1. 🪄 第一步：Prompt 咒語生成器
-* **雙模式支援**：
-  * **一般貼圖 (Sticker)**：4×3 網格大圖（1480×960 px），單格 370×320 px，附帶粗白邊與純綠色 (#00FF00) 去背背景。
-  * **表情貼 (Emoji)**：大頭特寫＋頭頂文字（720×540 px），單格 180×180 px，適合微縮顯示。
-* **多領域情境詞庫**：
-  * 貼圖：日常生活、上班社畜、情緒幹話、情侶撒嬌、節日慶祝、搞笑迷因。
-  * 表情貼：表情特寫、手勢動作、工作活動標籤、裝飾符號。
-* **自訂畫風與語言**：支援日系動漫、大眼賽璐璐、2D 平面可愛、手繪水彩、3D Q版皮克斯、美式卡通、復古像素風。
-* **一鍵隨機抽詞與複製**：點擊快速產生 12 格不同動作與表情的提示詞。
-
-### 2. ✂️ 第二步：4×3 網格切圖與智能去背
-* **自動精準切片**：完美將 4×3 網格大圖等比切割為 12 張獨立貼圖。
-* **Chroma Key 智能色鍵去背**：
-  * 綠幕去背（#00FF00）與純黑底去背預設。
-  * **色彩容許度 (Tolerance)** 與 **邊緣柔化 (Smoothness)** 調整。
-  * **綠幕溢色去除 (Despill)**：自動消除人物邊緣的綠光殘留。
-  * **向內縮放裁切 (Crop Scale)**：徹底消除網格格線黑邊。
-  * **滴管吸色**：點擊貼圖任意位置即可立即取色去背。
-* **自訂匯出與打包**：
-  * 自訂檔名前綴與起始流水號（如 `sticker_01.png`）。
-  * 單張個別預覽與下載。
-  * **JSZip 一鍵打包** 下載全部 12 張透明背景 PNG（`.zip`）。
+🌐 **線上即開即用（免安裝、跨平台）**：[開啟線上網頁版](https://dinghnes.github.io/line-sticker-maker/)
 
 ---
 
-## 🚀 工作流程
+## ✨ 升級亮點 (v2.2 Pro Max)
+
+### 1. 🛡️ 獨家「外圍泛洪去背 (Flood Fill)」演算法
+* **告別角色破洞**：傳統全圖去背會誤將角色身上的**綠色眼睛、綠色衣服、綠色飾品**一併挖空。
+* **智慧防穿孔**：演算法僅自 4 個外圍邊界向內蔓延，遇到角色外圍白邊自動停止。角色內部的綠色細節 **100% 完整保留**！
+* **效能巨幅提升**：採用平方距離過濾（Squared Distance），計算速度提升 5~10 倍，滑動參數即時反饋極致順滑。
+
+### 2. 👑 LINE 官方審查包一鍵搞定（自動產出 main.png & tab.png）
+* LINE 官方審核強制要求額外提供：
+  * `main.png`：240 × 240 px (主要封面圖)
+  * `tab.png`：96 × 74 px (聊天室貼圖標籤圖)
+* **自動生成**：可在介面任意指定喜歡的貼圖為封面，打包 ZIP 時系統自動等比縮放產出符合官方規格的 `main.png` 與 `tab.png`。
+* **官方標準命名**：一鍵切換 `01.png ~ 12.png` 命名格式，下載即可直接上傳 LINE Creators Market 送審！
+
+### 3. 🔍 4 種背景預覽切換 ＆ 放大檢視 (Lightbox)
+* **預覽底色即時切換**：
+  * 🏁 **透明棋盤格**：基礎透明度確認。
+  * ⚪ **純白底**：檢查文字易讀性與輪廓白邊。
+  * ⚫ **純黑底**：檢查有無未清除的白色噪點與雜邊。
+  * 🟢 **LINE 綠底**：經典聊天室綠底模擬，所見即所得。
+* **點擊放大鏡 (Lightbox)**：彈出高清大圖預覽，方便精細確認人物表情與去背細節。
+
+### 4. 🪄 Prompt 咒語生成擴充
+* 支援 10 大情境詞庫、7 種熱門畫風（日系動漫、大眼賽璐璐、3D皮克斯、手繪水彩等）。
+* **自動附加負向提示詞 (Negative Prompt)**：預防 Midjourney 生成常見的「多手指、畸變、背景雜點、破裂文字」問題。
+
+---
+
+## 🚀 製作流程圖
 
 ```mermaid
 flowchart LR
     A[1. 咒語生成器] -->|複製優化提示詞| B[2. Midjourney / DALL-E 生成 4x3 網格圖]
-    B -->|下載網格圖| C[3. 切圖去背工具]
-    C -->|拖曳上傳 ＋ 自動切割 ＋ 智能去背| D[4. 一鍵打包下載 ZIP]
-    D -->|符合 LINE 官方尺寸| E[5. 上傳 LINE Creators Market]
+    B -->|下載網格大圖| C[3. 切圖去背工具]
+    C -->|外圍泛洪去背 ＋ 防角色穿孔| D[4. 自動縮放 main.png 與 tab.png]
+    D -->|符合 LINE 官方規範 ZIP| E[5. 上架 LINE Creators Market]
 ```
 
-1. **生成咒語**：在「第一步：生成咒語」挑選模式、畫風、詞庫後，點擊「複製 Prompt」。
-2. **AI 生圖**：前往 Midjourney 或 DALL-E，貼上咒語並提供參考角色生成 4x3 網格大圖。
-3. **切圖去背**：切換至「第二步：切圖去背」，將生成的圖片拖曳上傳。
-4. **調整參數**：視情況微調「色彩容許度」或「溢色去除」，確保白邊完整、背景透明。
-5. **打包下載**：點擊「一鍵下載全部貼圖 (.ZIP)」，立即取得符合 LINE 規格之 12 張透明 PNG 圖檔！
+1. **生成咒語**：在「第一步：生成咒語」選擇貼圖/表情貼、畫風與詞庫，複製專屬 Prompt。
+2. **AI 生圖**：至 Midjourney 或 DALL-E 產生 4×3 綠幕大圖並下載。
+3. **切圖去背**：進入「第二步：切圖去背」，直接將圖片**拖曳上傳**。
+4. **檢查去背**：切換「白底 / 黑底 / LINE綠」檢查邊緣，點選喜歡的貼圖設為「★ 封面圖」。
+5. **一鍵打包**：點擊「一鍵打包全部貼圖 (.ZIP)」，立即取得包含 `01.png~12.png`、`main.png`、`tab.png` 的完整送審包！
 
 ---
 
@@ -59,31 +61,12 @@ flowchart LR
 
 | 檔案 | 說明 |
 | :--- | :--- |
-| `index.html` | 單一獨立 HTML 網頁版，雙擊即可在瀏覽器離線執行（亦可直接部署於 GitHub Pages） |
-| `LineStickerMaker.jsx` | 模組化 React 元件，適用於 Vite / Next.js / Create React App 等前端專案 |
-| `README.md` | 專案詳細說明文檔 |
-
----
-
-## 💻 本地使用方式
-
-### 方式一：直接開啟 HTML（推薦，零依賴）
-直接以瀏覽器（Chrome、Edge、Safari、Firefox）開啟 `index.html` 即可完整使用所有功能。
-
-### 方式二：在 React 專案中使用
-```bash
-npm install lucide-react jszip
-```
-將 `LineStickerMaker.jsx` 複製到專案的 `components` 目錄中並引用：
-```jsx
-import LineStickerMaker from './LineStickerMaker';
-
-export default function App() {
-  return <LineStickerMaker />;
-}
-```
+| `index.html` | 獨立 HTML 網頁版，雙擊即可在瀏覽器離線執行（亦支援直接部署於 GitHub Pages） |
+| `line_sticker_maker.html` | 備用獨立單檔 |
+| `LineStickerMaker.jsx` | 模組化 React 元件，適用於 Vite / Next.js / React 專案 |
+| `README.md` | 專案說明文件與使用指南 |
 
 ---
 
 ## 📄 開源授權
-本專案採用 [MIT License](LICENSE) 授權。歡迎自由修改與分享！
+本專案採用 [MIT License](LICENSE) 授權。
