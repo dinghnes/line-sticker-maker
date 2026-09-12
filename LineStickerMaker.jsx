@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import {
-  Copy, Check, LayoutGrid, Palette, Terminal, Briefcase, Heart, MessageCircle, Sun, Gift, Laugh, Shuffle, Type, ChevronDown, Smile, Hand, Star, Sticker, Upload, Download, RefreshCw, Scissors, Settings, Layers, Droplet, Package, FileText, Hash, Sparkles, Wand2, ZoomIn, X, ShieldAlert, CheckCircle2, Crown, FileUp, AlertCircle, Flame, Coffee, CheckCheck, Edit3, Smartphone, Send, Trash2, Plus
+  Copy, Check, LayoutGrid, Palette, Terminal, Briefcase, Heart, MessageCircle, Sun, Gift, Laugh, Shuffle, Type, ChevronDown, Smile, Hand, Star, Sticker, Upload, Download, RefreshCw, Scissors, Settings, Layers, Droplet, Package, FileText, Hash, Sparkles, Wand2, ZoomIn, X, ShieldAlert, CheckCircle2, Crown, FileUp, AlertCircle, Flame, Coffee, CheckCheck, Edit3, Smartphone, Send, Trash2, Plus, Search, Moon
 } from 'lucide-react';
 
 const ACTION_MAP = {
@@ -125,15 +125,33 @@ const ACTION_MAP = {
 
       "生日快樂": "雙手捧著插著蠟燭的精緻小蛋糕，頭戴派對帽歡呼",
 
-      "聖誕快樂": "戴紅色聖誕帽，抱著滿滿彩色禮物盒微笑"
+      "聖誕快樂": "戴紅色聖誕帽，抱著滿滿彩色禮物盒微笑",
+      "中秋快樂": "手捧金黃美味月餅，頭戴可愛柚子帽，身後一輪溫暖金色滿月，幸福燦爛微笑",
+      "中秋節": "頭戴綠色柚子皮削成的小帽子，雙手托腮，呆萌可愛微笑，背景一輪大明月",
+      "吃月餅": "雙手捧著咬了一口的金黃蛋黃酥月餅，雙頰鼓起咀嚼，滿臉幸福陶醉",
+      "賞月": "愜意坐在草地上仰望巨大的金色滿月，手捧熱茶，悠閒放鬆",
+      "賞月去": "一手提著小燈籠，一手指向天空大明月，步伐輕快出發",
+      "中秋烤肉": "手拿烤肉夾與香噴噴烤肉串，旁邊小烤肉架飄出炊煙，雙眼發光幸福嘴饞",
+      "烤肉啦": "雙手高舉烤肉串與飲料杯，旁邊炭火微紅，滿臉滿足大笑",
+      "柚子帽": "頭頂著手削綠色柚子皮造型小帽，雙手比讚，俏皮呆萌",
+      "月圓人團圓": "雙手張開比大圓圈，背景有一輪超大金黃明月與祥雲，溫馨祥和微笑",
+      "分你吃": "雙手捧著美味點心向前遞出，眼神真誠分享，笑容溫暖",
+      "團圓囉": "全家圍坐圓桌其樂融融，氣氛溫馨，背景有金色滿月"
 
     };
 
 
 
-    // 🌟 6 大經典爆款 12 格精選套裝（一鍵整套套用）
+    // 🌟 7 大經典爆款 12 格精選套裝（一鍵整套套用）
 
     const CURATED_PACKS = [
+      {
+        id: 'mid_autumn_fest',
+        name: '🌕 中秋團圓烤肉',
+        icon: <Moon size={14} className="text-amber-300" />,
+        desc: '中秋送禮、烤肉連假、月餅柚子應景神套裝',
+        phrases: ["中秋快樂", "月圓人團圓", "烤肉啦", "吃月餅", "賞月去", "柚子帽", "分你吃", "超香的", "乾杯", "吃太飽", "連假萬歲", "團圓囉"]
+      },
 
       {
 
@@ -887,6 +905,7 @@ const ACTION_MAP = {
 
         [/上課|下課|作業|訂正|考試|複習|排隊|集合|放學|老師|家長/, '拿課本、板夾或指示牌，清楚的教師／校園動作'],
 
+        [/中秋|月餅|柚子|賞月|烤肉/, '手捧香甜月餅或戴著柚子帽，身後一輪溫暖金色滿月，幸福微笑'],
         [/生日|新年|聖誕|恭喜|慶祝|乾杯|畢業|升遷|中獎/, '撒彩帶、舉杯或高舉雙手，開心慶祝'],
 
         [/雨|帶傘|好冷|穿暖|好熱|喝水/, '拿雨傘、水杯或擦汗，配合天氣做明顯動作'],
@@ -945,6 +964,33 @@ const ACTION_MAP = {
       const [includeActions, setIncludeActions] = useState(true); // 動作指令聯動開關
 
       const [batchInputText, setBatchInputText] = useState("");
+      const [phraseSearch, setPhraseSearch] = useState("");
+
+      // 全庫所有詞彙集合（供跨庫搜尋與輸入建議）
+      const allCategoryPhrases = useMemo(() => {
+        const list = [];
+        Object.values(currentCategories).forEach(cat => {
+          cat.pool.forEach(p => {
+            if (!list.includes(p)) list.push(p);
+          });
+        });
+        return list;
+      }, [currentCategories]);
+
+      // 跨分類即時搜尋結果
+      const searchResults = useMemo(() => {
+        if (!phraseSearch.trim()) return [];
+        const q = phraseSearch.trim().toLowerCase();
+        const results = [];
+        Object.values(currentCategories).forEach(cat => {
+          cat.pool.forEach(phrase => {
+            if (phrase.toLowerCase().includes(q) && !results.some(r => r.phrase === phrase)) {
+              results.push({ phrase, category: cat.label });
+            }
+          });
+        });
+        return results;
+      }, [phraseSearch, currentCategories]);
 
       const [showBatchModal, setShowBatchModal] = useState(false);
 
@@ -1131,7 +1177,7 @@ ugly, deformed, mutated, extra fingers, poorly drawn hands, missing limbs, disco
 
         if (mode === 'sticker') {
 
-          return `✅ LINE 貼圖 12 格｜v3.5 Style Pro Edition 旗艦 Prompt
+          return `✅ LINE 貼圖 12 格｜v3.6 Scenario Pro Edition 旗艦 Prompt
 
 請嚴格參考上傳圖片中的同一位角色，生成 4 × 3、共 12 格的 LINE 貼圖集。
 
@@ -1197,7 +1243,7 @@ ${negativePromptBlock}
 
 
 
-        return `✅ LINE 表情貼 12 格｜v3.5 Style Pro Edition 旗艦 Prompt
+        return `✅ LINE 表情貼 12 格｜v3.6 Scenario Pro Edition 旗艦 Prompt
 
 請嚴格參考上傳圖片中的同一位角色，生成 4 × 3、共 12 格的 LINE 表情貼圖集。
 
@@ -1393,7 +1439,7 @@ ${negativePromptBlock}
 
                     <span className="text-[10px] uppercase font-bold px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
 
-                      v3.5 Style Pro Edition
+                      v3.6 Scenario Pro Edition
 
                     </span>
 
@@ -1469,7 +1515,7 @@ ${negativePromptBlock}
 
 
 
-            {/* 🌟 6 大經典爆款 12 格精選套裝 (一鍵套用) */}
+            {/* 🌟 7 大經典爆款 12 格精選套裝 (一鍵套用) */}
 
             {mode === 'sticker' && (
 
@@ -1481,7 +1527,7 @@ ${negativePromptBlock}
 
                     <Crown size={16} className="text-amber-400" />
 
-                    <span className="text-sm font-bold text-slate-200">6 大經典爆款 12 格精選套裝</span>
+                    <span className="text-sm font-bold text-slate-200">7 大經典爆款 12 格精選套裝</span>
 
                     <span className="text-[10px] text-amber-400/90 bg-amber-400/10 px-2 py-0.5 rounded-full border border-amber-400/20">
 
@@ -1507,7 +1553,7 @@ ${negativePromptBlock}
 
 
 
-                <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2.5">
+                <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-7 gap-2">
 
                   {CURATED_PACKS.map(pack => (
 
@@ -2768,7 +2814,7 @@ ${negativePromptBlock}
                       Sticker Splitter <span className={mode === 'emoji' ? 'text-orange-400' : 'text-indigo-400'}>Pro Creator</span>
                     </h1>
                     <span className="text-[10px] uppercase font-bold px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
-                      v3.5 畫風旗艦版
+                      v3.6 情境旗艦版
                     </span>
                   </div>
                   <p className="text-slate-400 text-xs mt-1 flex items-center gap-1.5">
@@ -3642,7 +3688,7 @@ ${negativePromptBlock}
 
                     <Sparkles size={12} className="text-amber-400" />
 
-                    v3.5 Style Pro
+                    v3.6 Scenario Pro
 
                   </span>
 
