@@ -965,6 +965,18 @@ const ACTION_MAP = {
 
       const [batchInputText, setBatchInputText] = useState("");
       const [phraseSearch, setPhraseSearch] = useState("");
+      const [activeDropdown, setActiveDropdown] = useState(null);
+
+      // 點擊外部自動關閉下拉選單
+      useEffect(() => {
+        const handleClickOutside = (e) => {
+          if (!e.target.closest('.phrase-dropdown-container')) {
+            setActiveDropdown(null);
+          }
+        };
+        document.addEventListener('mousedown', handleClickOutside);
+        return () => document.removeEventListener('mousedown', handleClickOutside);
+      }, []);
 
       // 全庫所有詞彙集合（供跨庫搜尋與輸入建議）
       const allCategoryPhrases = useMemo(() => {
@@ -1843,7 +1855,7 @@ ${negativePromptBlock}
 
                       <span className="text-[11px] font-semibold text-slate-400">
 
-                        當前 12 格詞彙（可直接輸入編輯，支援下拉建議）：
+                        當前 12 格詞彙（可直接自由輸入，或點擊 ▾ 下拉自選詞庫）：
 
                       </span>
 
@@ -1857,15 +1869,7 @@ ${negativePromptBlock}
 
 
 
-                    <datalist id="category-pool-phrases">
-
-                      {currentPool.map((phrase, idx) => (
-
-                        <option key={idx} value={phrase} />
-
-                      ))}
-
-                    </datalist>
+                    
 
 
 
@@ -1883,68 +1887,108 @@ ${negativePromptBlock}
 
                         return (
 
-                          <div key={index} className="relative group bg-[#0f1117] p-2.5 rounded-xl border border-slate-800 hover:border-slate-700 transition">
-
+                                                    <div key={index} className="relative phrase-dropdown-container bg-[#0f1117] p-2.5 rounded-xl border border-slate-800 hover:border-slate-700 transition">
                             <div className="flex justify-between items-center mb-1 text-[10px] text-slate-500">
-
-                              <span>#{index + 1}</span>
-
+                              <span className="font-semibold text-slate-400">#{index + 1}</span>
                               <span className={`font-mono text-[9px] px-1 py-0.2 rounded ${
-
                                 isIdeal ? 'text-emerald-400 bg-emerald-500/10' : (isTooLong ? 'text-amber-400 bg-amber-500/10' : 'text-slate-500')
-
                               }`}>
-
                                 {len}字
-
                               </span>
-
                             </div>
 
-
-
-                            <div className="relative">
-
+                            <div className="relative flex items-center">
                               <input
-
                                 type="text"
-
                                 value={phrase}
-
                                 onChange={(e) => handlePhraseChange(index, e.target.value)}
-
-                                list="category-pool-phrases"
-
-                                className="w-full bg-[#151926] px-2.5 py-1.5 text-center text-xs font-bold text-slate-200 border border-slate-700/80 rounded-lg outline-none focus:border-emerald-500 transition"
-
+                                className="w-full bg-[#151926] pl-2.5 pr-7 py-1.5 text-center text-xs font-bold text-slate-200 border border-slate-700/80 rounded-lg outline-none focus:border-emerald-500 transition"
                                 placeholder={`第 ${index + 1} 格`}
-
                               />
-
-                              <div className="absolute right-2 top-1/2 transform -translate-y-1/2 pointer-events-none text-slate-600 group-hover:text-slate-400">
-
-                                <ChevronDown size={11} />
-
-                              </div>
-
+                              <button
+                                type="button"
+                                onClick={() => setActiveDropdown(activeDropdown === index ? null : index)}
+                                title="點擊展開詞庫下拉選單自選"
+                                className="absolute right-1 top-1/2 -translate-y-1/2 p-1 text-slate-400 hover:text-emerald-400 hover:bg-slate-800/80 rounded transition cursor-pointer"
+                              >
+                                <ChevronDown size={14} className={`transition-transform duration-200 ${activeDropdown === index ? 'rotate-180 text-emerald-400' : ''}`} />
+                              </button>
                             </div>
 
+                            {/* 💡 專屬智慧選詞下拉面板 (點選自己選擇) */}
+                            {activeDropdown === index && (
+                              <div className={`absolute z-50 mt-1.5 w-72 sm:w-80 bg-[#141824] border border-indigo-500/60 rounded-xl shadow-2xl p-3 text-left space-y-2.5 backdrop-blur-md ${
+                                (index % 3 === 2 || index % 2 === 1) ? 'right-0' : 'left-0'
+                              }`}>
+                                <div className="flex items-center justify-between border-b border-slate-800 pb-2">
+                                  <span className="text-[11px] font-bold text-slate-200 flex items-center gap-1.5">
+                                    <Sparkles size={13} className="text-amber-400" />
+                                    自選第 #{index + 1} 格詞彙
+                                  </span>
+                                  <button
+                                    type="button"
+                                    onClick={() => setActiveDropdown(null)}
+                                    className="text-slate-400 hover:text-white p-0.5 rounded"
+                                  >
+                                    <X size={13} />
+                                  </button>
+                                </div>
 
+                                {/* 切換分類下拉選單 */}
+                                <div className="space-y-1">
+                                  <div className="flex items-center justify-between text-[10px] text-slate-400">
+                                    <span>切換詞庫主題：</span>
+                                    <span className="text-emerald-400 font-mono">
+                                      {currentCategories[activeCategory]?.pool?.length || 0} 個詞可選
+                                    </span>
+                                  </div>
+                                  <select
+                                    value={activeCategory}
+                                    onChange={(e) => setActiveCategory(e.target.value)}
+                                    className="w-full bg-[#0b0c15] text-xs text-slate-200 border border-slate-700/80 rounded-lg px-2.5 py-1.5 outline-none focus:border-indigo-500 cursor-pointer"
+                                  >
+                                    {Object.values(currentCategories).map(cat => (
+                                      <option key={cat.id} value={cat.id}>
+                                        {cat.label} ({cat.pool.length} 詞)
+                                      </option>
+                                    ))}
+                                  </select>
+                                </div>
 
-                            {includeActions && (
-
-                              <p className="text-[9px] text-slate-500 mt-1 line-clamp-1" title={inferAction(phrase, index)}>
-
-                                動作：{inferAction(phrase, index)}
-
-                              </p>
-
+                                {/* 候選詞庫網格按鈕 */}
+                                <div className="space-y-1">
+                                  <div className="text-[10px] text-slate-400">點擊任意詞彙立即填入：</div>
+                                  <div className="grid grid-cols-3 gap-1.5 max-h-48 overflow-y-auto pr-1">
+                                    {(currentCategories[activeCategory]?.pool || []).map((p, pIdx) => (
+                                      <button
+                                        key={pIdx}
+                                        type="button"
+                                        onClick={() => {
+                                          handlePhraseChange(index, p);
+                                          setActiveDropdown(null);
+                                        }}
+                                        title={p}
+                                        className={`px-2 py-1.5 rounded-lg text-xs font-medium text-center transition truncate border cursor-pointer ${
+                                          phrase === p
+                                            ? 'bg-emerald-600 border-emerald-500 text-white font-bold shadow'
+                                            : 'bg-[#0b0c15] hover:bg-indigo-600/30 text-slate-300 hover:text-white border-slate-800 hover:border-indigo-500/50'
+                                        }`}
+                                      >
+                                        {p}
+                                      </button>
+                                    ))}
+                                  </div>
+                                </div>
+                              </div>
                             )}
 
+                            {includeActions && (
+                              <p className="text-[9px] text-slate-500 mt-1 line-clamp-1" title={inferAction(phrase, index)}>
+                                動作：{inferAction(phrase, index)}
+                              </p>
+                            )}
                           </div>
-
                         );
-
                       })}
 
                     </div>
