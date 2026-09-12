@@ -1213,45 +1213,43 @@
         return () => document.removeEventListener('mousedown', handleClickOutside);
       }, []);
 
+      const [showBatchModal, setShowBatchModal] = useState(false);
+
+      const currentCategories = mode === 'sticker' ? stickerCategories : emojiCategories;
+      const initialCategoryKey = mode === 'sticker' ? 'hots' : 'faces';
+      const [activeCategory, setActiveCategory] = useState(initialCategoryKey);
+      const [phrases, setPhrases] = useState(currentCategories[initialCategoryKey]?.pool?.slice(0, 12) || []);
+
       // 全庫所有詞彙集合（供跨庫搜尋與輸入建議）
       const allCategoryPhrases = useMemo(() => {
+        if (!currentCategories) return [];
         const list = [];
         Object.values(currentCategories).forEach(cat => {
-          cat.pool.forEach(p => {
-            if (!list.includes(p)) list.push(p);
-          });
+          if (cat && cat.pool) {
+            cat.pool.forEach(p => {
+              if (!list.includes(p)) list.push(p);
+            });
+          }
         });
         return list;
       }, [currentCategories]);
 
       // 跨分類即時搜尋結果
       const searchResults = useMemo(() => {
-        if (!phraseSearch.trim()) return [];
+        if (!phraseSearch.trim() || !currentCategories) return [];
         const q = phraseSearch.trim().toLowerCase();
         const results = [];
         Object.values(currentCategories).forEach(cat => {
-          cat.pool.forEach(phrase => {
-            if (phrase.toLowerCase().includes(q) && !results.some(r => r.phrase === phrase)) {
-              results.push({ phrase, category: cat.label });
-            }
-          });
+          if (cat && cat.pool) {
+            cat.pool.forEach(phrase => {
+              if (phrase.toLowerCase().includes(q) && !results.some(r => r.phrase === phrase)) {
+                results.push({ phrase, category: cat.label });
+              }
+            });
+          }
         });
         return results;
       }, [phraseSearch, currentCategories]);
-
-      const [showBatchModal, setShowBatchModal] = useState(false);
-
-
-
-      const currentCategories = mode === 'sticker' ? stickerCategories : emojiCategories;
-
-      const initialCategoryKey = mode === 'sticker' ? 'hots' : 'faces';
-
-
-
-      const [activeCategory, setActiveCategory] = useState(initialCategoryKey);
-
-      const [phrases, setPhrases] = useState(currentCategories[initialCategoryKey].pool.slice(0, 12));
 
 
 
