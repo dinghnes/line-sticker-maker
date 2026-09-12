@@ -22,7 +22,6 @@
   <script src="https://unpkg.com/lucide@0.344.0/dist/umd/lucide.js"></script>
 
   <style>
-    /* 自訂精美滾動條 */
     ::-webkit-scrollbar {
       width: 8px;
       height: 8px;
@@ -45,7 +44,6 @@
   <script type="text/babel">
     const { useState, useEffect, useCallback, useMemo, useRef } = React;
 
-    // Helper: 將 Lucide UMD 的 icon 規格轉成 React 元件
     const createIcon = (iconDef) => {
       return function Icon({ size = 20, color = "currentColor", strokeWidth = 2, className = "", ...props }) {
         if (!iconDef || !Array.isArray(iconDef)) return null;
@@ -66,7 +64,6 @@
       };
     };
 
-    // 常用圖標集合
     const Copy = createIcon(window.lucide?.Copy);
     const Check = createIcon(window.lucide?.Check);
     const LayoutGrid = createIcon(window.lucide?.LayoutGrid);
@@ -100,8 +97,124 @@
     const ZoomIn = createIcon(window.lucide?.ZoomIn);
     const X = createIcon(window.lucide?.X);
     const ShieldAlert = createIcon(window.lucide?.ShieldAlert);
-    const CheckCircle2 = createIcon(window.lucide?.CheckCircle2);
     const Crown = createIcon(window.lucide?.Crown);
+    const Flame = createIcon(window.lucide?.Flame);
+    const Coffee = createIcon(window.lucide?.Coffee);
+    const CheckCheck = createIcon(window.lucide?.CheckCheck);
+    const Edit3 = createIcon(window.lucide?.Edit3);
+
+    // =========================================================================
+    // 🧠 核心詞庫與超豐富「文字 ➔ 生動動作與神態」字典
+    // =========================================================================
+    const ACTION_MAP = {
+      "早安": "元氣揮手打招呼，朝氣蓬勃燦爛笑臉，身邊有微小晨光",
+      "晚安": "抱著小枕頭打哈欠，頭戴可愛睡帽，半瞇雙眼",
+      "午安": "端著美味午餐便當，神情愉悅滿足",
+      "謝謝": "雙手合十微微鞠躬，臉頰微紅微笑，周圍有點綴小花",
+      "不客氣": "笑瞇瞇單手輕擺，神態大方謙遜",
+      "對不起": "跪坐雙手抱頭，眼角泛淚，頭頂有歉意汗滴",
+      "沒問題": "拍拍胸脯打包票，自信豎起大拇指眨眼 Wink",
+      "好的": "認真點頭，比出 OK 手勢，神情信賴可靠",
+      "收到": "帥氣立正挺胸敬禮，眼神堅定專注",
+      "辛苦了": "雙手奉上一杯熱騰騰茶水，眼神充滿溫柔體貼",
+      "OK": "雙手比出大大的 OK 姿勢，活潑躍動",
+      "等等": "單手向前平推做出暫停手勢，神情略帶著急流汗",
+      "哈囉": "從畫面邊緣探出頭來俏皮揮手打招呼",
+      "再見": "轉身向後用力揮手道別，笑容依依不捨",
+      "路上小心": "雙手在胸前揮動叮嚀，眼神充滿溫暖關懷",
+      "吃飽沒": "捧著圓滾滾肚皮拍拍，露出吃飽傻笑",
+      "加油": "雙手握拳置於胸前打氣，眼中燃燒熱情鬥志",
+      "笑死": "誇張抱肚倒地大笑，眼角飆出淚珠，拍地狂笑",
+      "哭啊": "雙手抱頭跪地，瀑布般流下誇張眼淚，悲憤大喊",
+      "氣死": "雙頰漲紅鼓起像包子，頭頂冒出憤怒蒸氣",
+      "傻眼": "嘴角抽搐，額頭冒出三條黑線，呆滯無語",
+      "我就爛": "攤平在地上變成軟爛液體，神態無所謂又放鬆",
+      "是在哈囉": "歪頭挑眉，雙手掌心朝上攤開，滿臉黑人問號",
+      "真的假的": "眼睛瞪得滾圓，雙手驚訝摀住嘴巴",
+      "壓力山大": "背上揹著一塊巨大岩石，雙腿顫抖吃力咬牙",
+      "眼神死": "雙眼反白失去高光，整個人放空趴在桌上變成灰白色",
+      "發瘋": "雙手抓狂亂抓頭髮，雙眼呈現蚊香眼螺旋旋轉",
+      "想你": "雙手托腮望著天空發呆，身邊漂浮愛心泡泡",
+      "愛你": "雙手在頭頂比出巨大愛心，雙眼閃爍愛心高光",
+      "抱抱": "張開雙臂向前撲來求擁抱，嘟嘴撒嬌求安慰",
+      "親親": "嘟起粉嫩嘴唇湊上前，閉眼送出飛吻",
+      "理我": "用手指輕輕戳戳前方，咬嘴唇楚楚可憐",
+      "好想你": "緊緊抱住大愛心玩偶蹭臉頰，滿滿思念",
+      "啾咪": "單手比手指愛心，俏皮吐舌眨眼",
+      "開會中": "戴上黑框眼鏡抱著筆電，神情嚴肅專注敲鍵盤",
+      "趕工中": "頭綁必勝布條，雙手在鍵盤敲出殘影，四周燃燒工作火焰",
+      "加班中": "桌上堆滿公文與提神飲料，黑眼圈濃重仍狂敲滑鼠",
+      "下班！": "背起包包撞破大門興奮狂奔，身後留下殘影與音符",
+      "馬上好": "滿頭大汗飛速操作，回頭大喊包在我身上",
+      "求放過": "舉起雙手小白旗投降，淚汪汪乞求饒命",
+      "我太難了": "默默蹲在角落拿樹枝畫圈圈，頭頂有朵下雨烏雲",
+      "准奏": "穿著小龍袍威嚴揮手批准，氣場霸氣十足",
+      "這我": "單手推眼鏡，嘴角勾起看破一切的自信神秘微笑",
+      "破防了": "雙手摀胸口心碎特效，神情瞬間瓦解崩潰",
+      "要確欸": "瞇起雙眼緊盯前方，滿臉懷疑審視神態",
+      "急了": "雙腳原地踏步小碎步，手忙腳亂滿頭大汗",
+      "很躁": "雙手狂甩，頭頂冒出火花與憤怒塗鴉符號",
+      "純愛戰士": "胸口燃燒純真烈火，雙手握拳望向遠方堅定不移",
+      "躺平": "整個人裹在棉被裡只露出一雙無慾無求的眼睛",
+      "這把高端局": "雙手交叉胸前，身後浮現棋局與高深莫測氣場",
+      "最好是": "單手抱胸翻大白眼，嘴角不屑上揚",
+      "甘阿捏": "微微側頭瞇眼，嘴角似笑非笑充滿質疑",
+      "超派": "雙手叉腰霸氣外露，身後帶有漫畫速度線",
+      "拍謝啦": "單手摸後腦勺傻笑吐舌頭，身邊浮現道歉小汗珠",
+      "安啦": "神色自若單手比讚，滿臉包在我身上的從容",
+      "讚啦": "雙手高高豎起大拇指狂比讚，露出潔白牙齒閃光",
+      "先不要": "雙手在身前用力交叉成 X，連忙後退直搖頭",
+      "誇張欸": "雙手抱住臉頰下巴掉到地上，雙眼驚呆暴凸",
+      "新年快樂": "雙手抱拳作揖拜年，身邊圍繞喜慶紅包與鞭炮",
+      "生日快樂": "雙手捧著插著蠟燭的精緻小蛋糕，頭戴派對帽歡呼",
+      "聖誕快樂": "戴紅色聖誕帽，抱著滿滿彩色禮物盒微笑"
+    };
+
+    // 🌟 6 大經典爆款 12 格精選套裝
+    const CURATED_PACKS = [
+      {
+        id: 'daily_essential',
+        name: '日常高頻必備',
+        icon: <Sun size={14} className="text-amber-400" />,
+        desc: '日常聊天覆蓋率 90%，必備萬用神套裝',
+        phrases: ["早安", "收到", "謝謝", "辛苦了", "OK", "好的", "沒問題", "稍等", "等等", "笑死", "拜託", "再見"]
+      },
+      {
+        id: 'work_survive',
+        name: '上班社畜求生',
+        icon: <Briefcase size={14} className="text-blue-400" />,
+        desc: '上班族最愛買！滿滿辦公室共鳴與幽默',
+        phrases: ["收到", "開會中", "趕工中", "加班中", "馬上好", "求放過", "我太難了", "下班！", "准奏", "眼神死", "對不起", "沒問題"]
+      },
+      {
+        id: 'meme_trend',
+        name: '當紅熱門迷因',
+        icon: <Flame size={14} className="text-rose-400" />,
+        desc: '網路梗王專用，聊天不落俗套超有料',
+        phrases: ["這我", "破防了", "笑死", "要確欸", "急了", "很躁", "純愛戰士", "這把高端局", "躺平", "是在哈囉", "哭啊", "超派"]
+      },
+      {
+        id: 'taiwan_style',
+        name: '道地台味口頭禪',
+        icon: <Laugh size={14} className="text-emerald-400" />,
+        desc: '超接地氣台式生活反應，親切感滿分',
+        phrases: ["最好是", "是在哈囉", "甘阿捏", "超派", "哭啊", "拍謝啦", "安啦", "讚啦", "先不要", "誇張欸", "沒事啦", "笑死"]
+      },
+      {
+        id: 'lazy_life',
+        name: '厭世躺平耍廢',
+        icon: <Coffee size={14} className="text-purple-400" />,
+        desc: '不想努力了！表達疲憊與放空的極致態度',
+        phrases: ["我就爛", "眼神死", "躺平", "發瘋", "壓力山大", "傻眼", "哭啊", "等等", "求放過", "我太難了", "晚安", "對不起"]
+      },
+      {
+        id: 'couple_love',
+        name: '撒嬌情侶甜蜜',
+        icon: <Heart size={14} className="text-pink-400" />,
+        desc: '融化對方的小情侶專屬，甜度超標',
+        phrases: ["想你", "愛你", "抱抱", "親親", "好想你", "啾咪", "理我", "吃飽沒", "好棒", "晚安", "早安", "辛苦了"]
+      }
+    ];
 
     // ==========================================
     // Part 1: Prompt Generator Component
@@ -111,153 +224,76 @@
       const [language, setLanguage] = useState("台灣繁體中文");
       const [copied, setCopied] = useState(false);
       const [includeNegative, setIncludeNegative] = useState(true);
-      
-      const stickerCategories = {
-        daily: {
-          id: 'daily',
-          label: '日常生活',
-          icon: <Sun size={14} />,
-          pool: [
-            "早安", "晚安", "午安", "謝謝", "不客氣", "對不起", "沒問題", "好的", "收到", "拜託", 
-            "辛苦了", "OK", "等等", "哈囉", "再見", "路上小心", "好夢", "吃飽沒", "我也要", "走吧", 
-            "沒關係", "恭喜", "好久不見", "生日快樂", "加油", "沒事", "真的嗎", "了解", "抱歉", "麻煩了", 
-            "稍等", "出發", "回家", "睡覺", "起床", "餓了", "渴了", "好吃", "好玩", "開心", 
-            "難過", "生氣", "累了", "休息", "忙碌", "有空嗎", "在哪", "到了", "快到了", "塞車", 
-            "下雨", "好熱", "好冷", "穿暖點", "多喝水", "讚", "棒", "不錯", "可以", "不行", 
-            "隨便", "都好", "看你", "約嗎", "幾點", "哪裡", "這裡", "那裡", "誰", "什麼", 
-            "為什麼", "怎麼辦", "救命", "幫忙", "支援", "感謝", "感恩", "謝啦", "安安", "嗨", 
-            "掰掰", "明天見", "下次約", "有事", "沒事啦", "別擔心", "放心", "保重", "確實", "原來如此"
-          ]
-        },
-        work: {
-          id: 'work',
-          label: '上班社畜',
-          icon: <Briefcase size={14} />,
-          pool: [
-            "收到", "辛苦了", "開會中", "趕工中", "加班中", "請過目", "報告", "麻煩了", "收到謝謝", "准奏", 
-            "+1", "OK", "筆記", "處理中", "已送出", "求救", "我在忙", "馬上好", "修好了", "請確認", 
-            "Approved", "請款", "出差中", "您好", "早", "晚點回", "稍後", "會有會議嗎", "請問", "謝謝老闆", 
-            "好的沒問題", "了解", "收到了", "已讀", "馬上處理", "請批示", "簽核", "打卡", "下班", "績效"
-          ]
-        },
-        emotional: {
-          id: 'emotional',
-          label: '情緒幹話',
-          icon: <MessageCircle size={14} />,
-          pool: [
-            "笑死", "確？", "無言", "嚇死", "哭啊", "氣死", "好喔", "??", "!!", "恭喜", 
-            "加油", "傻眼", "我就爛", "是在哈囉", "真的假的", "別鬧", "壓力山大", "暈倒", "眼神死", "發瘋", 
-            "可憐", "羨慕", "太扯", "哈哈", "呵呵", "唉", "嘖", "哇靠", "幹嘛", "煩死", "爽啦"
-          ]
-        },
-        love: {
-          id: 'love',
-          label: '情侶撒嬌',
-          icon: <Heart size={14} />,
-          pool: [
-            "想你", "愛你", "抱抱", "親親", "晚安安", "餓了", "早點睡", "在幹嘛", "好棒", "哼", 
-            "拜託啦", "對不起", "理我", "好想你", "啾咪", "愛心", "可以嗎", "最愛你", "鼻要", "秀秀", 
-            "貼貼", "等你喔", "寶貝", "親愛的", "抱緊處理", "蹭蹭", "摸頭", "牽手"
-          ]
-        },
-        holiday: {
-          id: 'holiday',
-          label: '節日慶祝',
-          icon: <Gift size={14} />,
-          pool: [
-            "新年快樂", "生日快樂", "聖誕快樂", "恭喜發財", "情人節快樂", "端午安康", "中秋快樂", 
-            "跨年囉", "Happy Birthday", "恭喜恭喜", "大吉大利", "紅包拿來", "歲歲平安", "步步高升", 
-            "乾杯", "慶祝", "派對", "好運旺旺", "開工大吉", "心想事成"
-          ]
-        },
-        meme: {
-          id: 'meme',
-          label: '搞笑迷因',
-          icon: <Laugh size={14} />,
-          pool: [
-            "從從容容", "連滾帶爬", "超派", "尊嘟假嘟", "破防了", "觸爛", "很躁", "這我", "暈船", "下船", 
-            "純愛戰士", "戀愛腦", "I人", "E人", "笑爛", "要確欸", "急了", "紅溫", "貼臉開大", "優勢在我", 
-            "半場開香檳", "頂爛", "真頂", "有料", "這把高端局", "菜雞", "大腿", "凱瑞", "心態炸裂", "躺平", "社死"
-          ]
-        }
-      };
+      const [includeActions, setIncludeActions] = useState(true); // 動作指令聯動開關
+      const [batchInputText, setBatchInputText] = useState("");
+      const [showBatchModal, setShowBatchModal] = useState(false);
 
-      const emojiCategories = {
-        faces: {
-          id: 'faces',
-          label: '表情特寫',
-          icon: <Smile size={14} />,
-          pool: [
-            "大笑", "微笑", "眨眼", "飛吻", "愛心眼", "流口水", "大哭", "流淚", "驚訝", "尖叫", 
-            "生氣", "暴怒", "無言", "翻白眼", "想睡", "打哈欠", "生病", "戴口罩", "嘔吐", "暈倒", 
-            "墨鏡", "裝酷", "害羞", "臉紅", "疑惑", "思考", "流汗", "尷尬", "崩潰", "眼神死", 
-            "奸笑", "星星眼", "期待", "興奮", "滿足", "享受", "發呆", "放空"
-          ]
-        },
-        hands: {
-          id: 'hands',
-          label: '手勢動作',
-          icon: <Hand size={14} />,
-          pool: [
-            "比讚", "倒讚", "OK", "愛心", "手指愛心", "勝利YA", "擊掌", "合十感謝", "拜託", "鼓掌", 
-            "握拳加油", "指人", "打招呼", "揮手", "敬禮", "握手", "禁止手勢", "安靜手勢", "擁抱", "摸頭"
-          ]
-        },
-        work_tags: {
-          id: 'work_tags',
-          label: '工作標籤',
-          icon: <Briefcase size={14} />,
-          pool: [
-            "開會", "休假", "加班", "出差", "值班", "請假", "OK", "收到", "確認", "待辦", 
-            "完成", "急件", "重要", "提醒", "注意", "公告", "活動", "聚餐", "報名", "截止"
-          ]
-        },
-        symbols: {
-          id: 'symbols',
-          label: '裝飾符號',
-          icon: <Star size={14} />,
-          pool: [
-            "大愛心", "破碎愛心", "閃亮", "星星", "音符", "驚嘆號", "問號", "睡覺Zzz", "生氣符號", "汗滴", 
-            "火", "爆炸", "燈泡", "錢袋", "便便", "幽靈", "骷髏", "蛋糕", "禮物", "花朵"
-          ]
-        }
-      };
-
-      const currentCategories = mode === 'sticker' ? stickerCategories : emojiCategories;
-      const initialCategoryKey = mode === 'sticker' ? 'daily' : 'faces';
-
-      const getRandomPhrases = (pool) => {
-        const shuffled = [...pool].sort(() => 0.5 - Math.random());
-        return shuffled.slice(0, 12);
-      };
-
-      const [activeCategory, setActiveCategory] = useState(initialCategoryKey);
-      const [phrases, setPhrases] = useState(() => currentCategories[initialCategoryKey].pool.slice(0, 12));
-
-      useEffect(() => {
-        const defaultCat = mode === 'sticker' ? 'daily' : 'faces';
-        setActiveCategory(defaultCat);
-        setPhrases(getRandomPhrases(mode === 'sticker' ? stickerCategories.daily.pool : emojiCategories.faces.pool));
-      }, [mode]);
+      const [phrases, setPhrases] = useState(() => CURATED_PACKS[0].phrases);
 
       const styleOptions = [
         { value: "Japanese Anime", label: "日系動漫風 (推薦)", desc: "賽璐珞上色、線條清晰、動漫感" },
         { value: "Big Eyes Cel Shading", label: "大眼賽璐璐風", desc: "大眼、賽璐璐上色、日系Q版" },
-        { value: "2D Flat Cute", label: "2D 平面可愛", desc: "可愛、活潑、2D平面線條" },
+        { value: "2D Flat Cute", label: "2D 平面可愛", desc: "可愛、活潑、2D平面簡潔線條" },
         { value: "Hand Drawn Watercolor", label: "手繪水彩風", desc: "柔和、水彩筆觸、手繪質感" },
         { value: "3D Chibi Pixar", label: "3D Q版皮克斯風", desc: "3D 渲染、Q版比例、高品質材質" },
         { value: "American Cartoon", label: "美式卡通風", desc: "粗線條、誇張變形、鮮豔色彩" },
         { value: "Retro Pixel Art", label: "復古像素風", desc: "8-bit, 像素藝術, 復古遊戲風格" },
       ];
 
-      const handleCategoryChange = (catKey) => {
-        setActiveCategory(catKey);
-        setPhrases(getRandomPhrases(currentCategories[catKey].pool));
+      // 套用套裝組合
+      const handleApplyPack = (pack) => {
+        setPhrases([...pack.phrases]);
       };
 
+      // 隨機更換詞彙
       const handleShuffleCurrent = () => {
-        const pool = currentCategories[activeCategory]?.pool || [];
-        setPhrases(getRandomPhrases(pool));
+        const allWords = Object.keys(ACTION_MAP);
+        const shuffled = [...allWords].sort(() => 0.5 - Math.random());
+        setPhrases(shuffled.slice(0, 12));
+      };
+
+      // 批次套用文字
+      const handleApplyBatchText = () => {
+        if (!batchInputText.trim()) return;
+        const words = batchInputText
+          .split(/[,，\n、\s]+/)
+          .map(w => w.trim())
+          .filter(Boolean);
+        
+        if (words.length === 0) return;
+        const newPhrases = [...phrases];
+        for (let i = 0; i < 12; i++) {
+          if (words[i]) newPhrases[i] = words[i];
+        }
+        setPhrases(newPhrases);
+        setShowBatchModal(false);
+        setBatchInputText("");
+      };
+
+      const handlePhraseChange = (index, value) => {
+        const newPhrases = [...phrases];
+        newPhrases[index] = value;
+        setPhrases(newPhrases);
+      };
+
+      // 產生動作與神態描述
+      const getActionDescription = (phrase, index) => {
+        if (ACTION_MAP[phrase]) return ACTION_MAP[phrase];
+        const defaultActions = [
+          "做出活潑自信的揮手動作，燦爛笑容",
+          "雙手合十微微鞠躬，神態充滿真誠",
+          "興奮跳躍比出剪刀手 YA，身旁有閃爍星星",
+          "單手托腮思考，眼神充滿好奇與靈動",
+          "拍拍胸脯豎起大拇指比讚，自信十足",
+          "俏皮吐舌單眼眨眼 Wink，雙手比心",
+          "雙手叉腰開懷大笑，充滿感染力",
+          "雙手在胸前握拳打氣，熱血滿滿",
+          "雙手在身前擺動，露出可愛無奈表情",
+          "雙眼放光充滿期待，微微向前傾",
+          "端著熱咖啡啜飲，神情放鬆溫馨",
+          "手拿小筆記本認真點頭記錄"
+        ];
+        return defaultActions[index % defaultActions.length];
       };
 
       const generatePrompt = () => {
@@ -265,7 +301,11 @@
         const styleDesc = selectedStyle ? selectedStyle.desc : "賽璐珞上色、線條清晰、動漫感";
         const phraseString = phrases.join('、');
         
-        const negativeParams = includeNegative ? ` --no extra limbs, extra fingers, malformed hands, blur, complex background, text artifacts, duplicate character` : ``;
+        const actionBlock = includeActions ? `
+[12 格角色動作與表情對應設計]
+${phrases.map((p, i) => `${i + 1}.「${p}」：(${getActionDescription(p, i)})`).join('\n')}` : '';
+
+        const negativeParams = includeNegative ? ` --no extra limbs, extra fingers, malformed hands, blur, complex background, text artifacts, duplicate character, bad anatomy` : ``;
 
         if (mode === 'sticker') {
           return `✅ 12 格 LINE 貼圖 (Sticker)｜Prompt 建議
@@ -275,18 +315,19 @@
 角色一致性：必須完全維持原圖主角的髮型、服裝、五官與整體外觀特徵。
 構圖風格：畫面僅包含「角色 + 文字」，不包含任何場景背景。
 畫風設定：【${styleDesc}】。
-貼紙風格（去背友善）：角色與文字外圍皆需加入 粗白色外框（Sticker Style）。背景統一為 #00FF00（純綠色），不可有雜點與漸層。
+貼紙風格（去背友善）：角色與文字外圍皆需加入「粗白色外框（Sticker Style）」。背景統一為 #00FF00（純綠色），不可有雜點、光暈與漸層。
 
 [畫面佈局與尺寸規格]
 整體為 4 × 3 佈局，共 12 張貼圖。總尺寸：1480 × 960 px。
-每張小圖約 370 × 320 px。每張貼圖四周預留適度 Padding 間距，避免畫面互相黏住。
-鏡頭多樣化：全身 + 半身混合，包含正面、側面等豐富視角。
+每張小圖約 370 × 320 px。每張貼圖四周預留適度 Padding 間距，避免角色彼此互相黏住。
+鏡頭視角：全身與半身混合，必須包含正面、側面等多重視角。
+${actionBlock}
 
 [文字設計]
 語言：【${language}】
 文字內容：【${phraseString}】
-字型風格：可愛 Q 版字型，顏色鮮豔易讀，多色彩混合，絕對禁止使用任何綠色與黑色字體（改用紅、藍、紫、橘、黃等高對比色彩以利去背）。
-排版：文字適度置於角色身側或邊角，勿遮擋角色五官。
+字型風格：可愛 Q 版字型，顏色鮮豔易讀，多色彩混合，絕對禁止使用任何綠色與黑色字體（請改用紅、藍、紫、橘、黃等高對比色彩以利去背）。
+排版：文字大小約佔單張貼圖 1/3，可適度置於身側或非重要區域，切勿遮擋角色五官臉部。
 
 [輸出格式]
 一張大圖，內含 4 × 3 的 12 張貼圖。背景必須為純綠色 #00FF00。每格角色 + 文字均附上粗白邊。
@@ -304,6 +345,7 @@ Emoji 構圖重點：
 
 [畫面佈局]
 整體為 4 × 3 佈局，共 12 個表情貼。總尺寸：720 × 540 px，單張 180 × 180 px，排列整齊互不重疊。
+${actionBlock}
 
 [內容與文字設計]
 文字內容：【${phraseString}】
@@ -346,37 +388,29 @@ Emoji 構圖重點：
           setCopied(true);
           setTimeout(() => setCopied(false), 2000);
         } else {
-          alert("複製失敗，請手動全選下方框格文字複製。");
+          alert("複製失敗，請手動全選右側文字框複製。");
         }
       };
-
-      const handlePhraseChange = (index, value) => {
-        const newPhrases = [...phrases];
-        newPhrases[index] = value;
-        setPhrases(newPhrases);
-      };
-
-      const currentPool = currentCategories[activeCategory]?.pool || [];
 
       return (
         <div className={`w-full min-h-screen p-4 md:p-8 font-sans transition-colors duration-500 ${mode === 'sticker' ? 'bg-[#0f172a]' : 'bg-[#131127]'}`}>
           <div className="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-8">
             
-            {/* 左側：控制面板 */}
-            <div className="bg-[#1e293b] rounded-2xl shadow-xl p-6 space-y-6 border border-slate-700/60">
+            {/* 左側：詞庫與控制面板 */}
+            <div className="bg-[#1e293b] rounded-2xl shadow-xl p-6 space-y-5 border border-slate-700/70">
               
-              {/* Header */}
-              <div className="border-b border-slate-700 pb-4">
+              {/* 頂部切換 */}
+              <div className="border-b border-slate-700/80 pb-4">
                 <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
                   <div className="flex items-center space-x-3">
                     <div className={`p-2.5 rounded-xl text-white transition-colors shadow-lg ${mode === 'sticker' ? 'bg-emerald-600 shadow-emerald-600/20' : 'bg-indigo-600 shadow-indigo-600/20'}`}>
                       {mode === 'sticker' ? <Sticker size={24} /> : <Smile size={24} />}
                     </div>
                     <div>
-                      <h1 className="text-2xl font-bold text-white tracking-tight">
+                      <h1 className="text-xl sm:text-2xl font-black text-white tracking-tight">
                         Prompt 咒語生成器
                       </h1>
-                      <span className={`text-xs px-2.5 py-0.5 rounded-full font-semibold ${mode === 'sticker' ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30' : 'bg-indigo-500/20 text-indigo-300 border border-indigo-500/30'}`}>
+                      <span className={`text-[11px] px-2.5 py-0.5 rounded-full font-semibold ${mode === 'sticker' ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30' : 'bg-indigo-500/20 text-indigo-300 border border-indigo-500/30'}`}>
                         {mode === 'sticker' ? 'LINE 一般貼圖模式' : 'LINE 表情貼模式'}
                       </span>
                     </div>
@@ -385,61 +419,56 @@ Emoji 構圖重點：
                   <div className="flex bg-[#0f172a] p-1 rounded-xl border border-slate-700">
                     <button
                       onClick={() => setMode('sticker')}
-                      className={`flex items-center px-4 py-2 rounded-lg text-xs md:text-sm font-bold transition-all ${
+                      className={`flex items-center px-3.5 py-2 rounded-lg text-xs font-bold transition-all ${
                         mode === 'sticker' 
                           ? 'bg-emerald-600 text-white shadow-sm' 
                           : 'text-slate-400 hover:text-slate-200'
                       }`}
                     >
-                      <Sticker size={15} className="mr-1.5" />
+                      <Sticker size={14} className="mr-1.5" />
                       一般貼圖
                     </button>
                     <button
                       onClick={() => setMode('emoji')}
-                      className={`flex items-center px-4 py-2 rounded-lg text-xs md:text-sm font-bold transition-all ${
+                      className={`flex items-center px-3.5 py-2 rounded-lg text-xs font-bold transition-all ${
                         mode === 'emoji' 
                           ? 'bg-indigo-600 text-white shadow-sm' 
                           : 'text-slate-400 hover:text-slate-200'
                       }`}
                     >
-                      <Smile size={15} className="mr-1.5" />
+                      <Smile size={14} className="mr-1.5" />
                       表情貼
                     </button>
                   </div>
                 </div>
-                <p className="mt-3 text-xs text-slate-400 leading-relaxed">
-                  {mode === 'sticker' 
-                    ? '🟢 貼圖模式：生成含豐富文字與動作的大貼圖 (Sticker)，預留白邊，方便切圖與去背。' 
-                    : '🟣 表情貼模式：生成大頭特寫，上方搭配簡約文字 (Emoji)，極適合對話框微縮使用。'}
-                </p>
               </div>
 
               {/* 風格與語言 */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="space-y-2">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5">
+                <div className="space-y-1.5">
                   <label className="flex items-center text-xs font-semibold text-slate-300">
-                    <Palette size={15} className="mr-1.5 text-purple-400" />
+                    <Palette size={14} className="mr-1.5 text-purple-400" />
                     畫風選擇
                   </label>
                   <select
                     value={styleType}
                     onChange={(e) => setStyleType(e.target.value)}
-                    className="w-full p-2.5 bg-[#0f172a] border border-slate-700 rounded-xl text-slate-200 text-sm focus:ring-2 focus:ring-indigo-500 outline-none cursor-pointer"
+                    className="w-full p-2.5 bg-[#0f172a] border border-slate-700 rounded-xl text-slate-200 text-xs focus:ring-2 focus:ring-indigo-500 outline-none cursor-pointer"
                   >
                     {styleOptions.map((opt) => (
                       <option key={opt.value} value={opt.value}>{opt.label}</option>
                     ))}
                   </select>
                 </div>
-                <div className="space-y-2">
+                <div className="space-y-1.5">
                   <label className="flex items-center text-xs font-semibold text-slate-300">
-                    <Type size={15} className="mr-1.5 text-amber-400" />
+                    <Type size={14} className="mr-1.5 text-amber-400" />
                     語言設定
                   </label>
                   <select
                     value={language}
                     onChange={(e) => setLanguage(e.target.value)}
-                    className="w-full p-2.5 bg-[#0f172a] border border-slate-700 rounded-xl text-slate-200 text-sm focus:ring-2 focus:ring-indigo-500 outline-none cursor-pointer"
+                    className="w-full p-2.5 bg-[#0f172a] border border-slate-700 rounded-xl text-slate-200 text-xs focus:ring-2 focus:ring-indigo-500 outline-none cursor-pointer"
                   >
                     <option value="台灣繁體中文">台灣繁體中文</option>
                     <option value="English">English</option>
@@ -449,82 +478,113 @@ Emoji 構圖重點：
                 </div>
               </div>
 
-              {/* 內容編輯區 (12格) */}
-              <div className="space-y-3">
+              {/* 🌟 爆款情境套裝推薦（一鍵套用） */}
+              <div className="space-y-2">
                 <div className="flex justify-between items-center">
-                  <label className="flex items-center text-xs font-semibold text-slate-300">
-                    <LayoutGrid size={15} className={`mr-1.5 ${mode === 'sticker' ? 'text-emerald-400' : 'text-indigo-400'}`} />
-                    {mode === 'sticker' ? '貼圖文字內容 (12格)' : '表情貼文字 (12格)'}
-                  </label>
-                  <button 
-                    onClick={handleShuffleCurrent}
-                    className="text-xs px-3 py-1.5 rounded-lg flex items-center transition bg-[#0f172a] hover:bg-slate-800 text-slate-300 border border-slate-700 font-medium active:scale-95"
+                  <span className="text-xs font-bold text-slate-300 flex items-center gap-1.5">
+                    <Crown size={14} className="text-yellow-400" />
+                    經典熱銷套裝（一鍵套用 12 格黃金組合）
+                  </span>
+                  <button
+                    onClick={() => setShowBatchModal(true)}
+                    className="text-[11px] text-indigo-400 hover:text-indigo-300 flex items-center gap-1 hover:underline cursor-pointer"
                   >
-                    <Shuffle size={12} className="mr-1 text-yellow-400" /> 隨機換一組
+                    <Edit3 size={12} /> 批次貼上文字
                   </button>
                 </div>
 
-                {/* 快速場景按鈕 */}
-                <div className="grid grid-cols-3 gap-2 mb-2">
-                  {Object.values(currentCategories).map((cat) => (
+                <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+                  {CURATED_PACKS.map((pack) => (
                     <button
-                      key={cat.id}
-                      onClick={() => handleCategoryChange(cat.id)}
-                      className={`flex items-center justify-center p-2 rounded-xl text-xs font-medium transition-all ${
-                        activeCategory === cat.id 
-                          ? (mode === 'sticker' ? 'bg-emerald-600 text-white shadow-md' : 'bg-indigo-600 text-white shadow-md')
-                          : 'bg-[#0f172a] text-slate-400 border border-slate-700 hover:text-white hover:border-slate-600'
-                      }`}
+                      key={pack.id}
+                      onClick={() => handleApplyPack(pack)}
+                      className="p-2.5 rounded-xl bg-[#0f172a] border border-slate-700/80 hover:border-indigo-500/80 hover:bg-slate-800/80 text-left transition group"
                     >
-                      <span className="mr-1">{cat.icon}</span>
-                      {cat.label}
+                      <div className="flex items-center gap-1.5 text-xs font-bold text-slate-200 group-hover:text-white mb-1">
+                        {pack.icon}
+                        <span>{pack.name}</span>
+                      </div>
+                      <p className="text-[10px] text-slate-400 line-clamp-1 leading-tight">{pack.desc}</p>
                     </button>
                   ))}
                 </div>
-                
-                <datalist id="category-phrases">
-                  {currentPool.map((phrase, idx) => (
-                    <option key={idx} value={phrase} />
-                  ))}
-                </datalist>
+              </div>
 
-                <div className="grid grid-cols-3 sm:grid-cols-4 gap-2.5">
-                  {phrases.map((phrase, index) => (
-                    <div key={index} className="relative group">
-                      <input
-                        type="text"
-                        value={phrase}
-                        onChange={(e) => handlePhraseChange(index, e.target.value)}
-                        list="category-phrases" 
-                        className="w-full p-2 text-center text-xs sm:text-sm font-semibold bg-[#0f172a] border border-slate-700 rounded-lg text-slate-100 outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
-                        placeholder={mode === 'sticker' ? `貼圖 ${index + 1}` : `表情 ${index + 1}`}
-                      />
-                      <div className="absolute right-1.5 top-1/2 transform -translate-y-1/2 pointer-events-none text-slate-500">
-                        <ChevronDown size={11} />
-                      </div>
-                    </div>
-                  ))}
+              {/* 12 格貼圖文字編輯與神態 */}
+              <div className="space-y-2.5 pt-1 border-t border-slate-700/70">
+                <div className="flex justify-between items-center">
+                  <label className="flex items-center text-xs font-semibold text-slate-300">
+                    <LayoutGrid size={14} className={`mr-1.5 ${mode === 'sticker' ? 'text-emerald-400' : 'text-indigo-400'}`} />
+                    12 格文字清單（建議 2~4 字最佳）
+                  </label>
+                  <button 
+                    onClick={handleShuffleCurrent}
+                    className="text-xs px-2.5 py-1 rounded-lg flex items-center transition bg-[#0f172a] hover:bg-slate-800 text-slate-300 border border-slate-700 font-medium active:scale-95"
+                  >
+                    <Shuffle size={11} className="mr-1 text-yellow-400" /> 隨機換詞
+                  </button>
                 </div>
 
-                {/* 負向提示詞開關 */}
-                <div className="flex items-center justify-between pt-2 border-t border-slate-700/60 text-xs">
-                  <label className="flex items-center gap-1.5 text-slate-300 cursor-pointer">
-                    <ShieldAlert size={14} className="text-yellow-400" />
-                    自動附加負向提示詞（防畸變、多手指、背景雜點）
+                <div className="grid grid-cols-3 sm:grid-cols-4 gap-2">
+                  {phrases.map((phrase, index) => {
+                    const isLong = phrase.length > 4;
+                    const action = getActionDescription(phrase, index);
+                    return (
+                      <div key={index} className="relative group">
+                        <input
+                          type="text"
+                          value={phrase}
+                          onChange={(e) => handlePhraseChange(index, e.target.value)}
+                          className={`w-full p-2 text-center text-xs font-bold bg-[#0f172a] border rounded-lg text-slate-100 outline-none focus:ring-1 ${
+                            isLong ? 'border-amber-500/60 focus:border-amber-400' : 'border-slate-700 focus:border-indigo-500'
+                          }`}
+                          placeholder={`格 ${index + 1}`}
+                          title={`AI動作：${action}`}
+                        />
+                        {isLong && (
+                          <span className="absolute -top-1.5 -right-1 text-[9px] bg-amber-500 text-black px-1 rounded-full font-black scale-90" title="字數稍多，手機微縮可能不易辨識">
+                            !
+                          </span>
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
+
+                {/* 動作聯動與負向提示詞開關 */}
+                <div className="pt-2 space-y-1.5 border-t border-slate-700/60 text-xs">
+                  <label className="flex items-center justify-between text-slate-300 cursor-pointer">
+                    <span className="flex items-center gap-1.5">
+                      <Sparkles size={13} className="text-emerald-400" />
+                      開啟「文字 ➔ AI 生動動作神態聯動」（推薦，大幅提升角色動態）
+                    </span>
+                    <input
+                      type="checkbox"
+                      checked={includeActions}
+                      onChange={(e) => setIncludeActions(e.target.checked)}
+                      className="rounded bg-slate-800 border-slate-600 text-emerald-600 cursor-pointer"
+                    />
                   </label>
-                  <input
-                    type="checkbox"
-                    checked={includeNegative}
-                    onChange={(e) => setIncludeNegative(e.target.checked)}
-                    className="rounded bg-slate-800 border-slate-600 text-indigo-600 focus:ring-indigo-500 cursor-pointer"
-                  />
+
+                  <label className="flex items-center justify-between text-slate-300 cursor-pointer">
+                    <span className="flex items-center gap-1.5">
+                      <ShieldAlert size={13} className="text-yellow-400" />
+                      自動附加負向提示詞（防肢體畸變、多手指、背景雜點）
+                    </span>
+                    <input
+                      type="checkbox"
+                      checked={includeNegative}
+                      onChange={(e) => setIncludeNegative(e.target.checked)}
+                      className="rounded bg-slate-800 border-slate-600 text-indigo-600 cursor-pointer"
+                    />
+                  </label>
                 </div>
               </div>
             </div>
 
-            {/* 右側：預覽與輸出 */}
+            {/* 右側：生成的 Prompt 預覽 */}
             <div className="flex flex-col space-y-6">
-              <div className={`bg-[#1e293b] rounded-2xl shadow-xl p-6 flex flex-col h-full border-t-4 transition-colors border-slate-700/60 ${
+              <div className={`bg-[#1e293b] rounded-2xl shadow-xl p-6 flex flex-col h-full border-t-4 transition-colors border-slate-700/70 ${
                 mode === 'sticker' ? 'border-t-emerald-500' : 'border-t-indigo-500'
               }`}>
                 <h2 className="text-base font-bold text-white mb-3 flex items-center justify-between">
@@ -537,7 +597,7 @@ Emoji 構圖重點：
                   </span>
                 </h2>
                 
-                <div className="flex-grow bg-[#090b10] text-slate-200 p-4 rounded-xl font-mono text-xs sm:text-sm overflow-y-auto whitespace-pre-wrap leading-relaxed relative border border-slate-800 shadow-inner min-h-[320px] max-h-[460px]">
+                <div className="flex-grow bg-[#090b10] text-slate-200 p-4 rounded-xl font-mono text-xs overflow-y-auto whitespace-pre-wrap leading-relaxed relative border border-slate-800 shadow-inner min-h-[350px] max-h-[500px]">
                   {generatePrompt()}
                 </div>
 
@@ -556,54 +616,100 @@ Emoji 構圖重點：
                       </>
                     ) : (
                       <>
-                        <Copy size={20} className="mr-2" /> 複製 Prompt 提示詞
+                        <Copy size={20} className="mr-2" /> 複製完整 Prompt (含動作指令)
                       </>
                     )}
                   </button>
 
-                  <div className="text-xs p-3.5 rounded-xl leading-relaxed bg-[#0f172a] border border-slate-700/80 text-slate-300">
-                    <strong className="flex items-center gap-1 font-bold text-yellow-400 mb-1">
-                      <Sparkles size={14} /> 操作指南：
-                    </strong>
-                    <p>複製咒語後，在 Midjourney 上傳參考主角並貼上提示詞，生成 4×3 綠幕大圖後，即可切換至「<strong>第二步：切圖去背</strong>」進行自動切割與去背。</p>
+                  <div className="text-[11px] p-3 rounded-xl leading-relaxed bg-[#0f172a] border border-slate-700/80 text-slate-300">
+                    <strong className="text-yellow-400 font-bold block mb-1">💡 專業建議：</strong>
+                    每個詞彙已自動被賦予對應動作（例如：「早安」會揮手微笑、「收到」會帥氣敬禮、「笑死」會捧腹飆淚），生圖時 AI 能畫出神情各異的高品質貼圖！
                   </div>
                 </div>
               </div>
             </div>
 
           </div>
+
+          {/* 批次貼上 Modal */}
+          {showBatchModal && (
+            <div 
+              className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4"
+              onClick={() => setShowBatchModal(false)}
+            >
+              <div 
+                className="bg-[#1e293b] border border-slate-700 rounded-2xl p-6 max-w-md w-full shadow-2xl relative"
+                onClick={(e) => e.stopPropagation()}
+              >
+                <div className="flex justify-between items-center mb-3">
+                  <h3 className="text-base font-bold text-white flex items-center gap-1.5">
+                    <Edit3 size={16} className="text-indigo-400" />
+                    批次貼上 12 格文字
+                  </h3>
+                  <button onClick={() => setShowBatchModal(false)} className="text-slate-400 hover:text-white p-1">
+                    <X size={16} />
+                  </button>
+                </div>
+
+                <p className="text-xs text-slate-400 mb-3 leading-relaxed">
+                  請將 12 個文字貼在下方，支援以「逗號、空格或換行」分隔：
+                </p>
+
+                <textarea
+                  rows={4}
+                  value={batchInputText}
+                  onChange={(e) => setBatchInputText(e.target.value)}
+                  placeholder="範例：早安, 晚安, 收到, 謝謝, OK, 沒問題, 笑死, 哭啊, 辛苦了, 加油, 拜託, 掰掰"
+                  className="w-full p-3 bg-[#0f172a] border border-slate-700 rounded-xl text-xs text-slate-200 outline-none focus:border-indigo-500 mb-4 resize-none font-mono"
+                />
+
+                <div className="flex gap-2">
+                  <button
+                    onClick={() => setShowBatchModal(false)}
+                    className="flex-1 py-2.5 rounded-xl text-xs font-semibold bg-slate-800 text-slate-300 hover:bg-slate-700"
+                  >
+                    取消
+                  </button>
+                  <button
+                    onClick={handleApplyBatchText}
+                    className="flex-1 py-2.5 rounded-xl text-xs font-bold bg-indigo-600 hover:bg-indigo-500 text-white shadow-lg"
+                  >
+                    一鍵套用填入
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
+
         </div>
       );
     };
 
     // ==========================================
-    // Part 2: Image Splitter Component (全面升級版)
+    // Part 2: Image Splitter Component
     // ==========================================
     const ImageSplitter = ({ mode, setMode }) => {
       const [originalImage, setOriginalImage] = useState(null);
       const [stickers, setStickers] = useState([]);
       const [isDragging, setIsDragging] = useState(false);
       
-      // 去背核心參數
       const [enableSmartRemove, setEnableSmartRemove] = useState(true);
-      const [removalMode, setRemovalMode] = useState('flood'); // 'flood' (外圍泛洪防穿孔) | 'global' (全域色鍵)
+      const [removalMode, setRemovalMode] = useState('flood');
       const [cropScale, setCropScale] = useState(0);
       const [targetColor, setTargetColor] = useState('#00FF00');
       const [tolerance, setTolerance] = useState(30);
       const [smoothness, setSmoothness] = useState(2);
       const [despill, setDespill] = useState(true);
 
-      // LINE 規範與匯出設定
-      const [coverIndex, setCoverIndex] = useState(0); // 封面圖片索引（產生 main.png & tab.png）
-      const [includeOfficialAssets, setIncludeOfficialAssets] = useState(true); // 是否包含 main.png & tab.png
-      const [useLineNaming, setUseLineNaming] = useState(true); // 是否使用 LINE 官方 01.png 規範
+      const [coverIndex, setCoverIndex] = useState(0);
+      const [includeOfficialAssets, setIncludeOfficialAssets] = useState(true);
+      const [useLineNaming, setUseLineNaming] = useState(true);
       const [filePrefix, setFilePrefix] = useState('sticker');
       const [startNumber, setStartNumber] = useState('01');
       const [isZipping, setIsZipping] = useState(false);
 
-      // 預覽輔助
-      const [previewBg, setPreviewBg] = useState('checker'); // 'checker' | 'white' | 'black' | 'line-green'
-      const [activeModalSticker, setActiveModalSticker] = useState(null); // 放大燈箱檢視
+      const [previewBg, setPreviewBg] = useState('checker');
+      const [activeModalSticker, setActiveModalSticker] = useState(null);
 
       const CONFIG = useMemo(() => {
         if (mode === 'emoji') {
@@ -689,7 +795,6 @@ Emoji 構圖重點：
         e.target.value = '';
       };
 
-      // 4x3 網格等比精準分割
       const sliceImage = (img, currentConfig) => {
         const canvas = document.createElement('canvas');
         canvas.width = currentConfig.totalW;
@@ -720,7 +825,6 @@ Emoji 構圖重點：
         return newStickers;
       };
 
-      // 🚀 高效能智能色鍵與外圍泛洪去背演算法
       const processStickerData = useCallback((sourceCanvas) => {
         if (!enableSmartRemove) return sourceCanvas.toDataURL();
 
@@ -752,7 +856,6 @@ Emoji 構圖重點：
         const tolSmoothSq = tolSmooth * tolSmooth;
 
         if (removalMode === 'flood') {
-          // 泛洪去背（只從外圍向內去除，角色身上的綠眼/綠衣 100% 保留）
           const visited = new Uint8Array(w * h);
           const queue = [];
 
@@ -768,7 +871,6 @@ Emoji 構圖重點：
             }
           };
 
-          // 從 4 個外圍邊界開始蔓延
           for (let x = 0; x < w; x++) {
             checkAndPush(x, 0);
             checkAndPush(x, h - 1);
@@ -790,13 +892,12 @@ Emoji 構圖重點：
             const distSq = (r - tr)**2 + (g - tg)**2 + (b - tb)**2;
 
             if (distSq < tolSq) {
-              data[pi + 3] = 0; // 完全透明
+              data[pi + 3] = 0;
             } else if (distSq < tolSmoothSq) {
               const dist = Math.sqrt(distSq);
               data[pi + 3] = Math.min(data[pi + 3], ((dist - tol) / smooth) * 255);
             }
 
-            // 擴散至四鄰域
             if (cx > 0) checkAndPush(cx - 1, cy);
             if (cx < w - 1) checkAndPush(cx + 1, cy);
             if (cy > 0) checkAndPush(cx, cy - 1);
@@ -804,7 +905,6 @@ Emoji 構圖重點：
           }
 
         } else {
-          // 全域色鍵去背 (Global Keying)
           for (let i = 0; i < data.length; i += 4) {
             const r = data[i], g = data[i + 1], b = data[i + 2];
             const distSq = (r - tr)**2 + (g - tg)**2 + (b - tb)**2;
@@ -818,7 +918,6 @@ Emoji 構圖重點：
           }
         }
 
-        // 綠幕溢色去除 (Despill)
         if (despill) {
           for (let i = 0; i < data.length; i += 4) {
             const alpha = data[i + 3];
@@ -842,7 +941,6 @@ Emoji 構圖重點：
         return canvas.toDataURL('image/png');
       }, [enableSmartRemove, removalMode, cropScale, targetColor, tolerance, smoothness, despill, CONFIG]);
 
-      // 圖片參數變更時非同步重繪
       useEffect(() => {
         if (!originalImage || stickers.length === 0) return;
 
@@ -856,7 +954,6 @@ Emoji 構圖重點：
         return () => clearTimeout(timer);
       }, [processStickerData, originalImage]);
 
-      // 產生 LINE 官方 main.png (240x240) 與 tab.png (96x74)
       const generateLineOfficialAsset = (sourceDataUrl, targetW, targetH) => {
         return new Promise((resolve) => {
           const img = new Image();
@@ -868,7 +965,6 @@ Emoji 構圖重點：
             ctx.imageSmoothingEnabled = true;
             ctx.imageSmoothingQuality = 'high';
 
-            // 等比縮放置中並預留少許邊距
             const scale = Math.min((targetW - 12) / img.width, (targetH - 12) / img.height);
             const dw = img.width * scale;
             const dh = img.height * scale;
@@ -894,7 +990,6 @@ Emoji 構圖重點：
         document.body.removeChild(link);
       };
 
-      // 📦 一鍵批次打包 ZIP（含 LINE 官方 main.png & tab.png）
       const handleBatchDownload = async () => {
         if (!window.JSZip) {
           alert("系統正在載入 ZIP 打包元件，請稍候再試...");
@@ -907,7 +1002,6 @@ Emoji 構圖重點：
           const packFolderName = useLineNaming ? `line_sticker_package` : `${filePrefix}_pack`;
           const folder = zip.folder(packFolderName);
 
-          // 1. 放入 12 張貼圖
           stickers.forEach((sticker, index) => {
             const base64Data = sticker.processedUrl.split(',')[1];
             const fileName = useLineNaming 
@@ -916,7 +1010,6 @@ Emoji 構圖重點：
             folder.file(fileName, base64Data, { base64: true });
           });
 
-          // 2. 自動產出 LINE 官方 main.png (240x240) 與 tab.png (96x74)
           if (includeOfficialAssets && stickers[coverIndex]) {
             const coverUrl = stickers[coverIndex].processedUrl;
             const mainBase64 = await generateLineOfficialAsset(coverUrl, 240, 240);
@@ -954,7 +1047,6 @@ Emoji 構圖重點：
         }
       };
 
-      // 滴管取色：精確對齊 Canvas 像素
       const pickColorFromSticker = (e, sticker) => {
         if (!sticker) return;
         const rect = e.currentTarget.getBoundingClientRect();
@@ -989,7 +1081,6 @@ Emoji 構圖重點：
         }
       };
 
-      // 取得預覽背景樣式
       const getBgStyle = () => {
         if (previewBg === 'white') return { backgroundColor: '#ffffff' };
         if (previewBg === 'black') return { backgroundColor: '#000000' };
@@ -1006,13 +1097,13 @@ Emoji 構圖重點：
         <div className="w-full min-h-screen bg-[#0b0c15] p-4 md:p-8 font-sans text-slate-200">
           <div className="max-w-[1440px] mx-auto">
             
-            {/* 頂部 Header */}
+            {/* Header */}
             <div className="bg-[#151926] rounded-2xl shadow-xl p-6 mb-8 border border-slate-800/80 flex flex-col md:flex-row justify-between items-center gap-6 relative overflow-hidden group">
               <div className={`absolute top-0 left-0 w-full h-[2px] bg-gradient-to-r opacity-80 transition-colors duration-500 ${mode === 'emoji' ? 'from-amber-400 via-orange-500 to-red-500' : 'from-indigo-500 via-purple-500 to-pink-500'}`}></div>
               
               <div className="relative z-10">
                 <h1 className="text-2xl sm:text-3xl font-black flex items-center gap-3 text-white tracking-tight">
-                  <div className={`p-2.5 rounded-xl shadow-lg transition-colors duration-500 ${mode === 'emoji' ? 'bg-orange-500 shadow-orange-500/20' : 'bg-indigo-600 shadow-indigo-600/20'}`}>
+                  <div className={`p-2.5 rounded-xl shadow-lg transition-colors duration-500 ${mode === 'emoji' ? 'bg-orange-500 shadow-orange-500/20' : 'bg-indigo-600 shadow-indigo-500/20'}`}>
                     {mode === 'emoji' ? <Smile className="w-6 h-6 text-white" /> : <Scissors className="w-6 h-6 text-white" />}
                   </div>
                   Sticker Splitter <span className={`${mode === 'emoji' ? 'text-orange-400' : 'text-indigo-400'} font-light`}>Pro Max</span>
@@ -1023,7 +1114,6 @@ Emoji 構圖重點：
                 </p>
               </div>
               
-              {/* 模式切換與控制 */}
               <div className="flex flex-wrap gap-3 relative z-10 items-center">
                 <div className="bg-[#0f1117] p-1 rounded-xl border border-slate-700 flex relative">
                   <button 
@@ -1054,14 +1144,13 @@ Emoji 構圖重點：
               </div>
             </div>
 
-            {/* 工作區 */}
+            {/* Workspace */}
             {stickers.length > 0 ? (
               <div className="grid lg:grid-cols-12 gap-8">
                 
-                {/* 左側：去背控制面板 */}
+                {/* 左側：控制面板 */}
                 <div className="lg:col-span-4 xl:col-span-3 space-y-6">
                   
-                  {/* 去背參數 */}
                   <div className="bg-[#151926] text-gray-200 rounded-2xl shadow-xl border border-slate-800/80 overflow-hidden">
                     <div className="p-4 border-b border-slate-800 flex justify-between items-center bg-[#1a2030]">
                       <h2 className={`font-bold text-sm flex items-center gap-2 transition-colors ${mode === 'emoji' ? 'text-orange-400' : 'text-indigo-400'}`}>
@@ -1071,7 +1160,6 @@ Emoji 構圖重點：
                       <div 
                         className={`w-11 h-6 rounded-full p-1 cursor-pointer transition-all duration-300 ${enableSmartRemove ? (mode === 'emoji' ? 'bg-orange-500' : 'bg-indigo-600') + ' shadow-inner' : 'bg-slate-700'}`}
                         onClick={() => setEnableSmartRemove(!enableSmartRemove)}
-                        title="開啟 / 關閉智能去背"
                       >
                         <div className={`w-4 h-4 bg-white rounded-full shadow-md transform transition-transform ${enableSmartRemove ? 'translate-x-5' : 'translate-x-0'}`}></div>
                       </div>
@@ -1079,10 +1167,8 @@ Emoji 構圖重點：
 
                     {enableSmartRemove && (
                       <div className="p-5 space-y-5">
-                        
-                        {/* 演算法切換：外圍泛洪 (推薦) vs 全域色彩 */}
                         <div>
-                          <label className="text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-2 block flex items-center gap-1">
+                          <label className="text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-2 block">
                             去背模式 (防止破洞)
                           </label>
                           <div className="grid grid-cols-2 gap-2 p-1 bg-[#0f1117] rounded-xl border border-slate-800">
@@ -1093,7 +1179,6 @@ Emoji 構圖重點：
                                   ? (mode === 'emoji' ? 'bg-orange-500 text-white shadow-sm' : 'bg-indigo-600 text-white shadow-sm')
                                   : 'text-slate-400 hover:text-slate-200'
                               }`}
-                              title="由外向內蔓延，角色內部的綠色眼睛、綠色衣服完全不受影響！"
                             >
                               🛡️ 外圍泛洪 (推薦)
                             </button>
@@ -1104,7 +1189,6 @@ Emoji 構圖重點：
                                   ? (mode === 'emoji' ? 'bg-orange-500 text-white shadow-sm' : 'bg-indigo-600 text-white shadow-sm')
                                   : 'text-slate-400 hover:text-slate-200'
                               }`}
-                              title="全圖色彩替換去背"
                             >
                               🌐 全圖色鍵
                             </button>
@@ -1114,7 +1198,6 @@ Emoji 構圖重點：
                           </p>
                         </div>
 
-                        {/* 快捷預設 */}
                         <div>
                           <label className="text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-2 block">快捷底色</label>
                           <div className="grid grid-cols-2 gap-2">
@@ -1135,9 +1218,7 @@ Emoji 構圖重點：
                           </div>
                         </div>
 
-                        {/* 控制滑桿 */}
                         <div className="space-y-4">
-                          {/* 向內縮放裁切 */}
                           <div className="bg-[#0f1117] p-3 rounded-xl border border-slate-800">
                             <div className="flex justify-between text-xs mb-1.5">
                               <span className="text-slate-400 flex items-center gap-1 font-medium"><Layers className="w-3.5 h-3.5"/> 邊緣向內裁切 (消除黑邊)</span>
@@ -1153,7 +1234,6 @@ Emoji 構圖重點：
                             />
                           </div>
 
-                          {/* 目標去背色與吸色 */}
                           <div className="bg-[#0f1117] p-3 rounded-xl border border-slate-800">
                             <div className="flex justify-between items-center mb-2">
                               <span className="text-xs text-slate-400 font-medium">目標去背色</span>
@@ -1168,14 +1248,13 @@ Emoji 構圖重點：
                                   className="absolute -top-3 -left-3 w-[150%] h-[150%] cursor-pointer bg-transparent" 
                                 />
                               </div>
-                              <div className="h-8 px-2.5 flex items-center gap-1 bg-slate-800 border border-slate-700 rounded-lg text-slate-300 text-xs cursor-pointer" title="點擊右側任一貼圖底色即可直接取色">
+                              <div className="h-8 px-2.5 flex items-center gap-1 bg-slate-800 border border-slate-700 rounded-lg text-slate-300 text-xs cursor-pointer">
                                 <Droplet className="w-3.5 h-3.5 text-yellow-400" />
                                 <span>吸色</span>
                               </div>
                             </div>
                           </div>
 
-                          {/* 色彩容許度 */}
                           <div>
                             <div className="flex justify-between text-xs mb-1">
                               <span className="text-slate-400 font-medium">色彩容許度 (Tolerance)</span>
@@ -1191,7 +1270,6 @@ Emoji 構圖重點：
                             />
                           </div>
 
-                          {/* 邊緣柔化 */}
                           <div>
                             <div className="flex justify-between text-xs mb-1">
                               <span className="text-slate-400 font-medium">邊緣柔化 (Smoothness)</span>
@@ -1207,7 +1285,6 @@ Emoji 構圖重點：
                             />
                           </div>
 
-                          {/* 溢色去除 */}
                           <div className="flex items-center justify-between pt-2 border-t border-slate-800">
                             <span className="text-xs text-slate-300 font-medium">綠光溢色去除 (Despill)</span>
                             <div 
@@ -1222,7 +1299,7 @@ Emoji 構圖重點：
                     )}
                   </div>
 
-                  {/* 匯出與 LINE 官方送審設定 */}
+                  {/* 匯出設定 */}
                   <div className="bg-[#151926] rounded-2xl shadow-xl border border-slate-800/80 overflow-hidden">
                     <div className="p-4 bg-[#1a2030] border-b border-slate-800 flex justify-between items-center">
                       <h3 className={`font-bold flex items-center gap-2 text-sm ${mode === 'emoji' ? 'text-orange-400' : 'text-indigo-400'}`}>
@@ -1231,8 +1308,6 @@ Emoji 構圖重點：
                       </h3>
                     </div>
                     <div className="p-5 space-y-4">
-                      
-                      {/* 自動產生 main.png & tab.png */}
                       <div className="p-3 bg-[#0f1117] rounded-xl border border-slate-800 space-y-2">
                         <label className="flex items-center justify-between text-xs font-semibold text-slate-200 cursor-pointer">
                           <span className="flex items-center gap-1.5">
@@ -1246,15 +1321,8 @@ Emoji 構圖重點：
                             className="rounded bg-slate-800 border-slate-600 text-indigo-600 cursor-pointer"
                           />
                         </label>
-                        {includeOfficialAssets && (
-                          <div className="text-[11px] text-slate-400 flex items-center justify-between pt-1 border-t border-slate-800/80">
-                            <span>封面取自：貼圖 #{coverIndex + 1}</span>
-                            <span className="text-yellow-400/90 font-mono">main (240px) / tab (96px)</span>
-                          </div>
-                        )}
                       </div>
 
-                      {/* 檔名命名模式 */}
                       <div>
                         <div className="flex items-center justify-between mb-2">
                           <label className="text-xs font-semibold text-slate-400">命名規範</label>
@@ -1286,16 +1354,6 @@ Emoji 構圖重點：
                         )}
                       </div>
 
-                      {/* 預覽打包內容 */}
-                      <div className="text-[11px] text-slate-400 bg-[#0f1117] p-2.5 rounded-lg border border-slate-800/60 leading-relaxed">
-                        <span className="text-slate-500 block mb-1">📦 ZIP 打包將包含：</span>
-                        <div className="font-mono text-slate-300">
-                          {useLineNaming ? '• 01.png ~ 12.png' : `• ${filePrefix}_${formatNumber(startNumber, 0)}.png ...`}
-                          {includeOfficialAssets && <span className="text-yellow-400 block">• main.png (240x240) & tab.png (96x74)</span>}
-                        </div>
-                      </div>
-
-                      {/* 一鍵打包按鈕 */}
                       <button 
                         onClick={handleBatchDownload}
                         disabled={isZipping}
@@ -1318,56 +1376,45 @@ Emoji 構圖重點：
                       </button>
                     </div>
                   </div>
-
                 </div>
 
-                {/* 右側：貼圖網格預覽區 */}
+                {/* 右側：貼圖網格 */}
                 <div className="lg:col-span-8 xl:col-span-9 space-y-4">
-                  
-                  {/* 頂部輔助工具列：底色切換、尺寸提示 */}
                   <div className="flex flex-wrap items-center justify-between gap-3 text-xs bg-[#151926] py-2.5 px-4 rounded-xl border border-slate-800">
                     <div className="flex items-center gap-2">
                       <span className={`w-2.5 h-2.5 rounded-full ${mode === 'emoji' ? 'bg-orange-500' : 'bg-indigo-500'}`}></span>
                       規格：<span className="font-mono text-slate-200 font-bold">{CONFIG.cellW} × {CONFIG.cellH} px</span>
-                      <span className="text-slate-500">|</span>
-                      <span>點擊小圖可「放大檢視」或「設為封面」</span>
                     </div>
 
-                    {/* 底色切換按鈕 */}
                     <div className="flex items-center gap-1.5 bg-[#0f1117] p-1 rounded-lg border border-slate-800">
                       <span className="text-[11px] text-slate-400 px-1">檢視底色：</span>
                       <button
                         onClick={() => setPreviewBg('checker')}
                         className={`px-2 py-1 rounded text-[11px] font-semibold transition ${previewBg === 'checker' ? 'bg-slate-700 text-white' : 'text-slate-400 hover:text-white'}`}
-                        title="棋盤透明格"
                       >
                         🏁 透明
                       </button>
                       <button
                         onClick={() => setPreviewBg('white')}
                         className={`px-2 py-1 rounded text-[11px] font-semibold transition ${previewBg === 'white' ? 'bg-white text-black' : 'text-slate-400 hover:text-white'}`}
-                        title="純白底 (檢查文字)"
                       >
                         ⚪ 白底
                       </button>
                       <button
                         onClick={() => setPreviewBg('black')}
                         className={`px-2 py-1 rounded text-[11px] font-semibold transition ${previewBg === 'black' ? 'bg-slate-900 text-white border border-slate-600' : 'text-slate-400 hover:text-white'}`}
-                        title="純黑底 (檢查白邊)"
                       >
                         ⚫ 黑底
                       </button>
                       <button
                         onClick={() => setPreviewBg('line-green')}
                         className={`px-2 py-1 rounded text-[11px] font-semibold transition ${previewBg === 'line-green' ? 'bg-[#7AC043] text-white shadow-sm' : 'text-slate-400 hover:text-white'}`}
-                        title="LINE 聊天室經典綠底模擬"
                       >
                         🟢 LINE綠
                       </button>
                     </div>
                   </div>
 
-                  {/* 12 格貼圖預覽卡片 */}
                   <div className="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-4 gap-4">
                     {stickers.map((sticker, index) => {
                       const isCover = coverIndex === index;
@@ -1379,8 +1426,6 @@ Emoji 構圖重點：
                         <div key={sticker.id} className={`group relative bg-[#151926] rounded-2xl shadow-lg border overflow-hidden transition-all duration-200 hover:scale-[1.02] ${
                           isCover ? 'border-yellow-400 shadow-yellow-500/10' : 'border-slate-800 hover:border-slate-600'
                         }`}>
-                          
-                          {/* 卡片標題列 */}
                           <div className="flex justify-between items-center p-2 bg-[#1a2030] border-b border-slate-800/80 text-[10px] font-semibold">
                             <span className="flex items-center gap-1 text-slate-300">
                               #{index + 1}
@@ -1389,10 +1434,8 @@ Emoji 構圖重點：
                             <span className="font-mono text-slate-400">{fileName}</span>
                           </div>
 
-                          {/* 畫布檢視區 */}
                           <div 
                             className="relative cursor-crosshair overflow-hidden flex items-center justify-center p-2"
-                            title="點擊吸取底色，或點擊右上角放大"
                             style={{ 
                               aspectRatio: `${CONFIG.cellW}/${CONFIG.cellH}`,
                               ...getBgStyle()
@@ -1405,7 +1448,6 @@ Emoji 構圖重點：
                               alt={`Sticker ${index + 1}`}
                             />
 
-                            {/* 懸浮按鈕：放大燈箱檢視 */}
                             <button
                               onClick={(e) => {
                                 e.stopPropagation();
@@ -1418,7 +1460,6 @@ Emoji 構圖重點：
                             </button>
                           </div>
 
-                          {/* 卡片底部操作列 */}
                           <div className="p-2 bg-[#151926] border-t border-slate-800 flex gap-1.5">
                             <button 
                               onClick={() => setCoverIndex(index)}
@@ -1427,14 +1468,12 @@ Emoji 構圖重點：
                                   ? 'bg-yellow-500/20 text-yellow-300 border border-yellow-500/40' 
                                   : 'bg-slate-800/80 text-slate-400 hover:text-white'
                               }`}
-                              title="設為 LINE 上架 main.png 與 tab.png 封面圖"
                             >
                               {isCover ? '★ 封面圖' : '設為封面'}
                             </button>
                             <button 
                               onClick={() => handleDownloadSingle(sticker.processedUrl, index)}
                               className="p-1.5 rounded-lg bg-slate-800 hover:bg-indigo-600 text-slate-300 hover:text-white transition-all"
-                              title="單張下載"
                             >
                               <Download size={13} />
                             </button>
@@ -1446,7 +1485,6 @@ Emoji 構圖重點：
                 </div>
               </div>
             ) : (
-              // 空狀態 / 拖曳上傳區
               <div 
                 onDragOver={handleDragOver}
                 onDragLeave={handleDragLeave}
@@ -1493,7 +1531,7 @@ Emoji 構圖重點：
 
           </div>
 
-          {/* 🔍 點擊放大檢視 Modal (Lightbox) */}
+          {/* Lightbox Modal */}
           {activeModalSticker && (
             <div 
               className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4"
@@ -1564,8 +1602,6 @@ Emoji 構圖重點：
 
       return (
         <div className="flex flex-col min-h-screen font-sans bg-[#0b0c15]">
-          
-          {/* 頂部導覽列 */}
           <nav className="sticky top-0 z-40 bg-[#151926]/95 backdrop-blur border-b border-slate-800 shadow-md">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
               <div className="flex justify-between items-center h-16">
@@ -1607,13 +1643,12 @@ Emoji 構圖重點：
 
                 <div className="flex items-center gap-2">
                   <span className="text-xs font-semibold text-emerald-400 bg-emerald-950/60 px-3 py-1 rounded-full border border-emerald-800/80">
-                    v2.2 Pro Max
+                    v2.3 Content Pro
                   </span>
                 </div>
               </div>
             </div>
             
-            {/* 手機版分頁 */}
             <div className="sm:hidden flex border-t border-slate-800 bg-[#151926]">
               <button
                 onClick={() => setActiveTab('generator')}
@@ -1634,7 +1669,6 @@ Emoji 構圖重點：
             </div>
           </nav>
 
-          {/* 主體內容 */}
           <main className="flex-grow">
             {activeTab === 'generator' ? (
               <PromptGenerator mode={globalMode} setMode={setGlobalMode} />
@@ -1642,7 +1676,6 @@ Emoji 構圖重點：
               <ImageSplitter mode={globalMode} setMode={setGlobalMode} />
             )}
           </main>
-
         </div>
       );
     }
