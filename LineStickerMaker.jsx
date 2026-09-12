@@ -934,6 +934,7 @@ const ACTION_MAP = {
     const PromptGenerator = ({ mode, setMode }) => {
 
       const [styleType, setStyleType] = useState("Japanese Anime");
+      const [customStyleText, setCustomStyleText] = useState("");
 
       const [language, setLanguage] = useState("台灣繁體中文");
 
@@ -975,22 +976,24 @@ const ACTION_MAP = {
 
 
 
-      const styleOptions = [
-
+            const styleOptions = [
         { value: "Japanese Anime", label: "日系動漫風 (熱銷預設)", desc: "賽璐珞上色、線條乾淨、鮮豔二次元" },
-
         { value: "Big Eyes Cel Shading", label: "大眼賽璐璐萌系", desc: "靈動大眼睛、精緻賽璐珞光影、極致可愛" },
-
         { value: "2D Flat Cute", label: "2D 平面簡約可愛", desc: "極簡色塊、粗線條萌感、高對比易讀" },
-
         { value: "Hand Drawn Watercolor", label: "手繪水彩治癒風", desc: "柔和水彩暈染、溫暖手繪筆觸、清新療癒" },
-
         { value: "3D Chibi Pixar", label: "3D Q版皮克斯動畫風", desc: "精緻 3D 渲染、細膩黏土材質、圓潤討喜" },
-
         { value: "American Cartoon", label: "美式復古卡通風", desc: "誇張表情變形、粗黑線條、美式幽默" },
-
-        { value: "Retro Pixel Art", label: "復古像素點陣風", desc: "8-bit 像素藝術、懷舊電玩風格、方塊顆粒感" }
-
+        { value: "Retro Pixel Art", label: "復古像素點陣風", desc: "8-bit 像素藝術、懷舊電玩風格、方塊顆粒感" },
+        { value: "Wuxia Ink Martial", label: "🗡️ 經典東方武俠風", desc: "飄逸古風俠客服飾、靈動水墨劍氣筆韻、江湖豪邁俠氣、經典國風氣場" },
+        { value: "Hong Kong Manhua", label: "💥 熱血硬派港漫風", desc: "粗獷剛勁線條、精緻黑白交叉排線、誇張肌肉與動態張力、黃玉郎馬榮成熱血漫畫風格" },
+        { value: "Doodle Meme", label: "🐱 搞怪白爛手繪風", desc: "簡約隨性粗手繪線條、呆萌無厘頭表情、白爛搞笑、咖波白爛貓風格" },
+        { value: "Pastel Kawaii", label: "🍬 三麗鷗粉嫩糖果風", desc: "柔和粉嫩馬卡龍配色、圓滾滾飽滿輪廓、腮紅粉嫩萌感、三麗鷗治癒系" },
+        { value: "Minimalist Line", label: "✏️ 極簡黑白線條風", desc: "極簡純黑墨線、大幅白色留白、誇張喜感肢體、日系黑白幽默" },
+        { value: "Storybook Gouache", label: "📚 溫暖童話繪本風", desc: "溫暖不透明水粉厚塗、童話繪本筆觸、手作粗糙紙張紋理、治癒文青感" },
+        { value: "Claymation 3D", label: "🧸 軟萌黏土手作風", desc: "圓潤立體黏土雕塑質感、定格動畫公仔立體感、手工微光澤與軟萌比例" },
+        { value: "Pop Mart Vinyl", label: "🎁 潮玩盲盒公仔風", desc: "泡泡瑪特盲盒玩具感、細緻啞光 PVC 搪膠材質、大頭小身精美高光" },
+        { value: "Retro Shoujo", label: "✨ 80年代復古少女漫", desc: "70-80年代經典復古動漫風、眼睛閃爍繁複星星高光、誇張戲劇性華麗網點" },
+        { value: "Custom", label: "✏️ 自訂自填風格 (Custom)", desc: "自訂專屬畫風描述" }
       ];
 
 
@@ -1095,7 +1098,10 @@ const ACTION_MAP = {
 
         const selectedStyle = styleOptions.find(s => s.value === styleType);
 
-        const styleDesc = selectedStyle ? selectedStyle.desc : "賽璐珞上色、線條清晰、動漫感";
+        let styleDesc = selectedStyle ? selectedStyle.desc : "賽璐珞上色、線條清晰、動漫感";
+        if (styleType === "Custom" && customStyleText.trim()) {
+          styleDesc = customStyleText.trim();
+        }
 
 
 
@@ -1125,7 +1131,7 @@ ugly, deformed, mutated, extra fingers, poorly drawn hands, missing limbs, disco
 
         if (mode === 'sticker') {
 
-          return `✅ LINE 貼圖 12 格｜v3.4 Pro Creator Edition 旗艦 Prompt
+          return `✅ LINE 貼圖 12 格｜v3.5 Style Pro Edition 旗艦 Prompt
 
 請嚴格參考上傳圖片中的同一位角色，生成 4 × 3、共 12 格的 LINE 貼圖集。
 
@@ -1191,7 +1197,7 @@ ${negativePromptBlock}
 
 
 
-        return `✅ LINE 表情貼 12 格｜v3.4 Pro Creator Edition 旗艦 Prompt
+        return `✅ LINE 表情貼 12 格｜v3.5 Style Pro Edition 旗艦 Prompt
 
 請嚴格參考上傳圖片中的同一位角色，生成 4 × 3、共 12 格的 LINE 表情貼圖集。
 
@@ -1387,7 +1393,7 @@ ${negativePromptBlock}
 
                     <span className="text-[10px] uppercase font-bold px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
 
-                      v3.4 Pro Creator Edition
+                      v3.5 Style Pro Edition
 
                     </span>
 
@@ -2762,7 +2768,7 @@ ${negativePromptBlock}
                       Sticker Splitter <span className={mode === 'emoji' ? 'text-orange-400' : 'text-indigo-400'}>Pro Creator</span>
                     </h1>
                     <span className="text-[10px] uppercase font-bold px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
-                      v3.4 旗艦創作者版
+                      v3.5 畫風旗艦版
                     </span>
                   </div>
                   <p className="text-slate-400 text-xs mt-1 flex items-center gap-1.5">
@@ -3636,7 +3642,7 @@ ${negativePromptBlock}
 
                     <Sparkles size={12} className="text-amber-400" />
 
-                    v3.4 Pro Creator
+                    v3.5 Style Pro
 
                   </span>
 
